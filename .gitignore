@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.validation/
+.private-local/
+.privacy-clean/
+*.sqlite3*
+*.sqlite
+*.db
+.env*
+output/
+*.rejected.json
+build/
+dist/
+tests/fixtures/
