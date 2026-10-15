@@ -5,9 +5,9 @@ if not exist ".venv\Scripts\python.exe" (
   py -3.12 -m venv .venv
   if errorlevel 1 goto fail
 )
-".venv\Scripts\python.exe" -m pip install -r requirements.txt
+".venv\Scripts\python.exe" -m pip install -r requirements-desktop.txt
 if errorlevel 1 goto fail
-echo Ready. Double-click go-webui.bat to launch AquaSync.
+echo Ready. Double-click start-desktop.bat to launch AquaSync.
 pause
 exit /b 0
 :fail
