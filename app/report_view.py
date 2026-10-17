@@ -154,7 +154,7 @@ class ReportCanvas(QWidget):
         heading=QPainterPath();heading.addText(56,99,self.report_font(36,True),m['title'])
         p.setPen(QPen(QColor('#e64775'),9,Qt.PenStyle.SolidLine,Qt.PenCapStyle.RoundCap,Qt.PenJoinStyle.RoundJoin));p.setBrush(QColor('#fffaf1'));p.drawPath(heading)
         p.setPen(Qt.PenStyle.NoPen);p.drawPath(heading)
-        self.text(p,(54,118,1150,27),f"{m['version']} · {'未完成筛选 · ' if m['onlyMissing'] else ''}总进度 {m['completed']} / {m['total']} · 当前展示 {DIFF[m['difficulty']]} · 分母沿用原分析曲库",14,'#314960',True)
+        self.text(p,(54,118,1150,27),f"{m['version']} · {'未完成筛选 · ' if m['onlyMissing'] else ''}总进度 {m['completed']} / {m['total']} · 当前展示 {DIFF[m['difficulty']]} · 分母：{m.get('scopeLabel','原分析曲库')}",14,'#314960',True)
         start=310 if len(m['title'])<9 else 760
         for i,c in enumerate(m['counts']):
             x=start+i*91

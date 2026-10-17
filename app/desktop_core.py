@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from app.database import Database
 from app.parser import parse_aquadx
-from app.calculations import summarize
+from app.calculations import summarize, plate_progress
 from app.private_catalog import private_view, display_catalog
 from app.local_tools import library_rows, filter_library, recommendations
 from app.lxns import LxnsService
@@ -56,6 +56,12 @@ class DesktopCore:
             raise ValueError('请先导入 AquaDX JSON')
         charts = self.db.charts()
         report = summarize(payload, charts)
+        # Plate coverage uses the complete reference catalog, independently of B50.
+        report['analysisPlates'] = report['plates']
+        report['plateCatalog'] = display_catalog(charts, self.db.private_charts())
+        report['plateScopeLabel'] = '完整私服参考曲库'
+        report['plates'] = plate_progress(payload['best'], report['plateCatalog'])
+        report['calculation']['plateScope'] = 'merged JP reference catalog; not proof of server-awarded plates'
         report['privateCatalog'] = private_view(payload['best'], charts, self.db.private_charts(), self.lxns.catalog())
         report['b50Views'] = self.lxns.b50_views(payload, display_catalog(charts, self.db.private_charts()))
         report['recommendations'] = recommendations(report['best'])

@@ -391,8 +391,10 @@ class MainWindow(QMainWindow):
         if path: self.safe(lambda: Path(path).write_text(json.dumps(self.data['privateCatalog'],ensure_ascii=False,indent=2),encoding='utf8'))
 
     def make_plates(self):
-        layout = self.page('牌子进度', '按等级分组的曲绘完成表；浅色覆盖和绿色勾代表已完成。版本从旧到新，分母沿用原分析曲库。点击曲绘查看单曲。')
+        layout = self.page('牌子进度', '默认使用完整私服参考曲库，版本从旧到新；这是参考完成进度，不代表官服授牌。可切回原分析曲库。点击曲绘查看单曲。')
         filters=QHBoxLayout();layout.addLayout(filters)
+        self.plate_scope=QComboBox();self.plate_scope.addItems(['完整私服参考曲库','原分析曲库']);filters.addWidget(self.plate_scope)
+        self.plate_scope.currentIndexChanged.connect(self.render_plates)
         self.plate_version=QComboBox();filters.addWidget(self.plate_version)
         self.plate_mark=QComboBox();self.plate_mark.addItems(['将','极','神','舞舞']);self.plate_mark.setCurrentIndex(1);filters.addWidget(self.plate_mark)
         self.plate_difficulty=QComboBox();self.plate_difficulty.addItems(list(DIFF_NAME for DIFF_NAME in DIFFICULTIES));self.plate_difficulty.setCurrentIndex(3);filters.addWidget(self.plate_difficulty)
@@ -432,16 +434,21 @@ class MainWindow(QMainWindow):
 
     def render_plates(self):
         if not self.data: return
-        self.plate_names = list(self.data['plates'])
-        fill(self.plates, [[v]+[f"{m['completed']} / {m['total']} · {m['percent']}%" if m['supported'] else '不支持' for m in self.data['plates'][v].values()] for v in self.plate_names])
+        self.active_plate_data=dict(self.data)
+        self.active_plate_data['plateScopeLabel']=self.plate_scope.currentText()
+        if self.plate_scope.currentIndex()==1:
+            self.active_plate_data['plates']=self.data.get('analysisPlates',self.data['plates'])
+            self.active_plate_data['plateCatalog']=self.core.db.charts()
+        self.plate_names = list(self.active_plate_data['plates'])
+        fill(self.plates, [[v]+[f"{m['completed']} / {m['total']} · {m['percent']}%" if m['supported'] else '不支持' for m in self.active_plate_data['plates'][v].values()] for v in self.plate_names])
         fill(self.plate_missing, [])
         previous=self.plate_version.currentText();self.plate_version.blockSignals(True);self.plate_version.clear();self.plate_version.addItems(self.plate_names)
-        self.plate_version.setCurrentText(previous if previous in self.plate_names else self.plate_names[-1]);self.plate_version.blockSignals(False)
+        self.plate_version.setCurrentText(previous if previous in self.plate_names else (self.plate_names[-1] if self.plate_names else ''));self.plate_version.blockSignals(False)
         self.render_plate_canvas()
 
     def render_plate_canvas(self):
         if not self.data or not self.plate_version.currentText():return
-        model=plate_report(self.data,self.core.db.charts(),self.plate_version.currentText(),self.plate_mark.currentText(),self.plate_difficulty.currentIndex(),self.plate_only_missing.isChecked())
+        model=plate_report(self.active_plate_data,self.core.db.charts(),self.plate_version.currentText(),self.plate_mark.currentText(),self.plate_difficulty.currentIndex(),self.plate_only_missing.isChecked())
         self.plate_canvas.set_report(model)
 
     def export_plate_image(self):
@@ -462,7 +469,7 @@ class MainWindow(QMainWindow):
 
     def plate_detail(self, i, j):
         if j==0 or not self.data: return
-        version = self.plate_names[i]; mark=['将','极','神','舞舞'][j-1]; progress = self.data['plates'][version][mark]
+        version = self.plate_names[i]; mark=['将','极','神','舞舞'][j-1]; progress = self.active_plate_data['plates'][version][mark]
         self.plate_version.setCurrentText(version);self.plate_mark.setCurrentText(mark)
         self.plate_label.setText(f"{version} · {mark} · 剩余 {progress['remaining']} 张")
         fill(self.plate_missing,[[r['title'],DIFFICULTIES[r['level']],r['musicId']] for r in progress['missing']])

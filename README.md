@@ -1,4 +1,4 @@
-# AquaSync 1.0
+# AquaSync 1.0.1
 
 Windows 本地舞萌查分软件，支持导入 AquaDX 导出的 maimai2 JSON。
 

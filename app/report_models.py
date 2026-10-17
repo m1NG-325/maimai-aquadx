@@ -27,6 +27,7 @@ def b50_report(data, view, catalog, label):
 
 def plate_report(data, charts, version, mark, difficulty=3, only_missing=False):
     progress=data['plates'][version][mark]
+    charts=data.get('plateCatalog',charts)
     standard=[c for c in charts if c['music_id']<100000 and c['level_index']<5]
     if version=='真':
         required=[c for c in standard if c['version'] in ('maimai','maimai PLUS') and c['music_id']!=70 and c['level_index']<4]
@@ -51,4 +52,4 @@ def plate_report(data, charts, version, mark, difficulty=3, only_missing=False):
     return dict(title=PLATE_WORDS.get(version,version)+mark+'完成表',version=version,mark=mark,difficulty=difficulty,
                 supported=progress['supported'],counts=counts,completed=progress['completed'],total=progress['total'],
                 groups=[{'level':level,'charts':sorted(rows,key=lambda c:c['music_id'])} for level,rows in sorted(groups.items(),key=lambda x:-order(x[0]))],
-                onlyMissing=only_missing)
+                onlyMissing=only_missing,scopeLabel=data.get('plateScopeLabel','原分析曲库'))
