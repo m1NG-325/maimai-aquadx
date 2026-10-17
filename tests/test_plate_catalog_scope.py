@@ -39,7 +39,9 @@ def test_full_reference_versions_and_all_report_denominators(tmp_path):
     assert core.db.player('example')==payload
     legacy=summarize(payload,core.db.charts())
     assert data['analysisPlates']==legacy['plates']
-    assert data['rating']==legacy['rating'] and data['b50']==legacy['b50']
+    assert legacy['rating']==0  # The legacy catalog does not contain the newly added chart.
+    assert data['rating']>0 and data['b50']==data['recommendationScopes']['private']['b50']
+    assert data['b50Views']['source']['rating']==None  # No original composition was supplied.
     assert not data['privateCatalog']['rows'][0]['lxnsSupported']
 
 

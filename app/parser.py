@@ -1,5 +1,6 @@
 """AquaDX best-record parsing. Achievement uses 1/10000 percent units."""
 from decimal import Decimal, InvalidOperation
+from app.score_times import latest_time,playlog_times,attach_latest
 
 DIFFICULTIES = ('BASIC', 'ADVANCED', 'EXPERT', 'MASTER', 'Re:MASTER')
 FC = {0: '', 1: 'fc', 2: 'fcp', 3: 'ap', 4: 'app'}
@@ -39,7 +40,7 @@ def parse_record(item):
             'dxScore': dx, 'scoreRank': item.get('scoreRank'), 'comboStatus': combo,
             'syncStatus': sync, 'fc': FC[combo], 'fs': FS[sync],
             'ap': FC[combo] if combo >= 3 else '',
-            'playCount': integer(item.get('playCount', 0), 'playCount')}
+            'playCount': integer(item.get('playCount', 0), 'playCount'), **latest_time(item)}
 
 
 def best_records(records):
@@ -54,6 +55,7 @@ def best_records(records):
         if record['achievement'] > old['achievement']:
             for field in ('achievement', 'achievements', 'scoreRank'):
                 old[field] = record[field]
+        attach_latest(old,{key:record} if record.get('lastPlayedTimestamp') is not None else {})
         old['dxScore'] = max(old['dxScore'], record['dxScore'])
         old['playCount'] = max(old['playCount'], record['playCount'])
         if record['comboStatus'] > old['comboStatus']:
@@ -122,6 +124,8 @@ def parse_aquadx(data):
                 records.extend(parse_record(dict(child, musicId=child.get('musicId', item.get('musicId')))) for child in nested)
             else:
                 records.append(parse_record(item))
+    times=playlog_times(data.get('userPlaylogList',[]))
+    for record in records:attach_latest(record,times)
     user = data.get('userData', {})
     if not isinstance(user, dict):
         raise ValueError('userData must be an object')

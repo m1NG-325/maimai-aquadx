@@ -1,4 +1,4 @@
-"""Independent, offline plate catalogs; never change B50 or upload eligibility."""
+"""Offline regional plate membership snapshots; metadata is resolved by UnifiedCatalog."""
 import json
 from pathlib import Path
 from app.versions import canonical_version

@@ -51,7 +51,7 @@ def private_view(best, base, private, lxns):
         target = lxns.get((r['musicId'] % 10000, 'dx' if r['musicId'] >= 10000 else 'standard', r['level'])) if r['musicId'] < 100000 else None
         rows.append(dict(r, title=c['title'] if c else None, ds=c['ds'] if c else None,
                          version=c['version'] if c else None, chart_level=c['level'] if c else None,
-                         metadataSource=c.get('source', '本地分析曲库') if c else None,
+                         metadataSource=c.get('constantSource') or c.get('source', '本地分析曲库') if c else None,
                          referenceOnly=bool(c and c.get('reference_only')), lxnsSupported=target is not None))
     return {'rows': rows, 'known': sum(r['title'] is not None for r in rows),
             'unknown': sum(r['title'] is None for r in rows), 'referenceCharts': len(private)}

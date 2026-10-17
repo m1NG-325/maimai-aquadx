@@ -1,6 +1,34 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+if exist "dist\v1.2\AquaSync.exe" (
+  start "" "dist\v1.2\AquaSync.exe"
+  exit /b 0
+)
+if exist "dist\v1.1\AquaSync-latest.exe" (
+  start "" "dist\v1.1\AquaSync-latest.exe"
+  exit /b 0
+)
+if exist "dist\score-sorting\AquaSync.exe" (
+  start "" "dist\score-sorting\AquaSync.exe"
+  exit /b 0
+)
+if exist "dist\score-cards\AquaSync.exe" (
+  start "" "dist\score-cards\AquaSync.exe"
+  exit /b 0
+)
+if exist "dist\unified-catalog\AquaSync.exe" (
+  start "" "dist\unified-catalog\AquaSync.exe"
+  exit /b 0
+)
+if exist "dist\recommend-scopes\AquaSync.exe" (
+  start "" "dist\recommend-scopes\AquaSync.exe"
+  exit /b 0
+)
+if exist "dist\rating-table\AquaSync.exe" (
+  start "" "dist\rating-table\AquaSync.exe"
+  exit /b 0
+)
 if exist "dist\v1.1\AquaSync.exe" (
   start "" "dist\v1.1\AquaSync.exe"
   exit /b 0

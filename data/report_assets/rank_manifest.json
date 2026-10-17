@@ -1,0 +1,107 @@
+{
+  "upstream": "https://github.com/mai-kit/mai-kit",
+  "commit": "32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d",
+  "retrieved": "2026-10-17",
+  "license": "docs/MaiKit-Assets-LICENSE.txt",
+  "ownership": "Game graphics and trademarks remain with SEGA and respective rights holders.",
+  "assets": [
+    {
+      "file": "rating-rank_d.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/d.png",
+      "sha256": "44a0615ab01e13b1c16c37b45e78eeb0c10c3c550fd17111c7a3bb55cdcea47e",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_c.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/c.png",
+      "sha256": "cf3a4ec9d3761db10b1e4abf9b1eed16dbd20a69a444aacb04889545d65727ea",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_b.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/b.png",
+      "sha256": "cb984e2455d3cee47e438c43cbd65a420426960faea7b4e31b7b45d2ad585a00",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_bb.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/bb.png",
+      "sha256": "ee556e02dd994a90e14bec59c239ab602280f0f42ff0717ad92f7cfe9bf449b4",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_bbb.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/bbb.png",
+      "sha256": "10924eed6502469c5effb2bcc8d5a5f4a4b6060a543f1d0088f671a3f22ade73",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_a.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/a.png",
+      "sha256": "3e8f9dc7570b14d6cb2efc858439afe877a4ff33430bb0ab9a1106fc60067d14",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_aa.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/aa.png",
+      "sha256": "522c88810ade3cb0a094c488bf5d6a9f5d5aae08ac65854e14a2e29062ac48f7",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_aaa.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/aaa.png",
+      "sha256": "c33db428b22bac68670930015154dbdd6b5a8ec1bce932e834650e1e07dec351",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_s.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/s.png",
+      "sha256": "4008218e9b818f67d47abdca5406bd2b02cc00499c5d3af2216e5d034e1c1d86",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_sp.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/sp.png",
+      "sha256": "21bf31fe536b9e4d321ac96bee992caa460471914440b70763ea141e3542126b",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_ss.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/ss.png",
+      "sha256": "b22134d7c02f3e6def40531dd137e3142a76d640d3625634711e038e45e23fb1",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_ssp.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/ssp.png",
+      "sha256": "b8ebfff618b076a8aa71a3715add194b7dcfd4ce33c035b76753b3e70a639a16",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_sss.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/sss.png",
+      "sha256": "67a83a5ea11ae70b2ba1777a18fbfabe42ead676ab4edd80354a20a92a5172f5",
+      "width": 256,
+      "height": 120
+    },
+    {
+      "file": "rating-rank_sssp.png",
+      "url": "https://raw.githubusercontent.com/mai-kit/mai-kit/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank/sssp.png",
+      "sha256": "57513c5ca9610beb56f3e54f0c83b09679d2d77427eed181bf3a025c1d5a3cec",
+      "width": 256,
+      "height": 120
+    }
+  ]
+}

@@ -28,3 +28,35 @@
 <h2>参考源码与依赖</h2>
 <p>KarenBot 参考提交 <b>da03d8cc3e19edd698482c1c6e750a04655dcbfa</b>，上方已逐项列出参考算法及复用素材。KarenBot 与 KarenBot-Resources 的上游 MIT 许可已随软件附在 licenses 目录（源码包 docs/KarenBot-LICENSE.txt、KarenBot-Resources-LICENSE.txt）。AquaSync 的 Python、Qt 界面、SQLite、迁移与同步模块为本项目实现；没有运行 QQ bot 服务。</p>
 <p>运行与构建依赖：<a href="https://www.python.org/">Python</a>（Decimal、hashlib、random、sqlite3、文件操作等标准库），<a href="https://doc.qt.io/qtforpython-6/">PySide6 / Qt for Python</a>（原生界面与绘制），<a href="https://sqlite.org/">SQLite</a>（本地数据库），<a href="https://www.python-httpx.org/">HTTPX</a>（网络请求），<a href="https://fastapi.tiangolo.com/">FastAPI</a>（兼容 API 模块，桌面版不启动服务），<a href="https://docs.pydantic.dev/">Pydantic</a> / <a href="https://www.starlette.io/">Starlette</a>（FastAPI 依赖），<a href="https://pyinstaller.org/">PyInstaller</a>（Windows 打包）。源码 requirements.txt / requirements-desktop.txt 记录固定版本；uvicorn 仅保留给兼容 API 启动，未用于桌面运行。</p>
+
+## Rating 彩色对照表
+
+- `app/rating_table.py` 使用本项目现有 `app/calculations.py::rating` 和系数表动态生成，未从参考图片抄录数值或素材。评级系数来源沿用上文的 KarenBot Rating 参考。
+- 默认定数范围 12.0～15.0，每行 0.1，可调整为 0.1～20.0。列包含 S～SSS+ 达成率及临界点。
+- 加 1 分门槛先求 `(起点Rating + 1) × 100 / (定数 × 当前系数)`，向上舍入到 0.0001%；在下一个系数区间前无法达到时显示 —。
+- 表格点击填入原计算器，不写入成绩或改变 B50；颜色仅用于区分 Rating 数值。
+
+## 分地区推分推荐
+
+`app/recommendation_scopes.py` 将两套定数、分组与候选池分开，再调用既有 `app/local_tools.py::recommendations` 算法。私服参考合并基础曲库、日服含删曲快照与私服补充元数据；排除比所选版本更晚的曲目。私服导出新曲组能唯一对应参考版本时自动选择，否则默认最新参考版本并提示手动核对。国服采用落雪曲库的普通谱面、定数与当前年度版本分组，排除停用或版本未知谱面。
+
+两个模式都只使用本地导入成绩；未收录、特殊谱面和缺定数不参与推荐。B35/B15门槛分别由各自已计算成绩建立；未满组时门槛为0。收益为目标Rating减去当前Rating与组门槛的较大值，仅表示单谱替换收益，不可相加。原始成绩、上传资格及旧版兼容推荐接口不变。
+
+## 统一桌面曲库
+
+`app/unified_catalog.py::UnifiedCatalog` 是桌面共享元数据入口，按 musicId、难度、地区、版本保存变体；没有把不同地区定数压成同一个值。私服优先级从低至高为基础库、私服补充、日服历史快照、日服现行快照；国服为KarenBot国服参考加落雪国服缓存。相同版本优先用高优先级非空字段，未知值不覆盖已核实值，并单独保留定数来源。重收录曲目的历史版本仍保留在牌子分母中。全部曲库以私服参考为同谱面默认展示，国服变体可单独查询。
+
+共享层每次由当前数据源构造，不向成绩表写入合并结果；新版本元数据可自动用于已有玩家。成绩、原始B50补名和参考单曲Rating、估算B50、查询/随机、推荐、详情和其他桌面工具统一读取。B50新旧分组识别沿用推荐中的导出新曲版本识别规则；估算与私服原报分开。牌子成员资格仍受原范围要求清单控制；落雪导出/上传资格依旧只使用落雪已确认收录的曲库，统一展示不增加远端资格。旧版独立兼容API的基础曲库计算保持其协议口径。
+
+## 最近游玩与成绩排序
+
+`app/score_times.py` 仅从谱面记录明确的lastPlayedAt/lastPlayDate等字段及导出userPlaylogList中的userPlayDate/playDate解析真实日期，按musicId+难度选最大时间；不使用登录时间、排列位置或Rating猜测。ISO日期（含时区）、紧凑日历日期及Unix秒/毫秒可解析，无时区按UTC+8处理，非法/零时间忽略。只存最近时间及字段来源，不保留日志中的多人昵称、店铺信息等无关字段；逐局日志不会额外制造最佳成绩条目。
+
+`app/score_sorting.py` 实现八种双向排序，缺定数、缺Rating与缺时间永远在末尾，平手按达成率降序、ID、难度稳定排列。FC排序为AP+、AP、FC+、FC、无；AP排序为AP+、AP、其它。排序不写回成绩。
+
+## 高清评级素材
+
+14种D～SSS+原始透明PNG来源：[mai-kit rank目录](https://github.com/mai-kit/mai-kit/tree/32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d/packages/assets/assets/rank)，固定提交32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d，每张256×120，未修改像素。逐文件URL与SHA256见data/report_assets/rank_manifest.json，MIT声明保留在docs/MaiKit-Assets-LICENSE.txt。游戏图形与商标归SEGA等相应权利人；未复制上游程序代码。Qt直接从原图绘制，详情根据设备像素比生成显示缓存。
+
+
+2026-10-17：FC/FC+/AP/AP+、FS/FS+/FSD/FSD+/SYNC 和空状态图标采用 mai-kit/mai-kit 固定提交 32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d 的 packages/assets/assets/bonus 原始 80×80 透明 PNG；未放大伪造源分辨率。逐文件来源和 SHA256 见 data/report_assets/status_manifest.json；许可见 docs/MaiKit-Assets-LICENSE.txt。游戏素材权利归 SEGA 及相应权利人。

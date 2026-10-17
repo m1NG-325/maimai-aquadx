@@ -5,6 +5,7 @@ datas = [(str(root / 'data' / name), 'data') for name in
          ['music_data.json', 'private_music_data.json', 'plate_catalogs.json', 'lxns_song_list.json', 'karen_courses.json']]
 datas.append((str(root/'docs/KarenBot-LICENSE.txt'), 'licenses'))
 datas.append((str(root/'docs/KarenBot-Resources-LICENSE.txt'), 'licenses'))
+datas.append((str(root/'docs/MaiKit-Assets-LICENSE.txt'), 'licenses'))
 datas.append((str(root/'data/report_assets'), 'data/report_assets'))
 a = Analysis([str(root/'desktop.py')], pathex=[str(root)], binaries=[], datas=datas,
              hiddenimports=[], hookspath=[], hooksconfig={}, runtime_hooks=[],

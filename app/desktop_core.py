@@ -7,11 +7,13 @@ from pathlib import Path
 from app.database import Database
 from app.parser import parse_aquadx
 from app.calculations import summarize, plate_progress
-from app.private_catalog import private_view, display_catalog
+from app.private_catalog import private_view
 from app.local_tools import library_rows, filter_library, recommendations
-from app.lxns import LxnsService
+from app.lxns import LxnsService, catalog_index
 from app.desktop_storage import default_settings_path,configured_directory,copy_profile,save_directory
 from app.plate_catalogs import load_plate_catalogs, SCOPE_KEYS, SCOPE_LABELS
+from app.recommendation_scopes import private_recommendations, cn_recommendations
+from app.unified_catalog import UnifiedCatalog
 
 ASSETS = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[1]))
 
@@ -32,6 +34,15 @@ class DesktopCore:
         self.lxns = LxnsService(target, backup_path=self.db.path)
         self.courses = json.loads((ASSETS/'data/karen_courses.json').read_text(encoding='utf8'))
         self.plate_catalogs = load_plate_catalogs(ASSETS/'data/plate_catalogs.json')
+
+    def shared_catalog(self):
+        # Resolve against live source snapshots; no persistent merged cache to become stale.
+        with self.lxns.catalog_guard:
+            data=json.loads(self.lxns.catalog_path.read_text(encoding='utf-8'))
+        return UnifiedCatalog(self.db.charts(),self.db.private_charts(),self.plate_catalogs,catalog_index(data),data.get('versions',[]))
+
+    def catalog(self,scope='private'):
+        return self.shared_catalog().charts(scope)
 
     def migrate_directory(self,directory):
         target=Path(directory).expanduser().resolve()
@@ -56,23 +67,36 @@ class DesktopCore:
         payload = self.db.player(user_id)
         if payload is None:
             raise ValueError('请先导入 AquaDX JSON')
-        charts = self.db.charts()
-        report = summarize(payload, charts)
+        registry = self.shared_catalog()
+        charts = registry.charts('private')
+        scopes = self.recommendation_scopes(payload,registry=registry)
+        report = summarize(payload, charts,scopes['private']['currentVersion'])
+        report['b50']=scopes['private']['b50']
+        report['rating']=scopes['private']['rating']
         # Plate coverage uses the complete reference catalog, independently of B50.
-        report['analysisPlates'] = report['plates']
+        report['analysisPlates'] = summarize(payload,self.db.charts())['plates']
+        resolved_scopes=registry.plate_scopes()
         report['plateScopes'] = {}
         for key, label in zip(SCOPE_KEYS, SCOPE_LABELS):
-            scope = self.plate_catalogs['scopes'][key]
+            scope = resolved_scopes[key]
             report['plateScopes'][key] = dict(plateCatalog=scope['charts'], plateRequirements=scope.get('requirements'),
                 plateScopeLabel=label, plateDescription=scope['description'],
                 plates=plate_progress(payload['best'], scope['charts'], scope.get('requirements')))
         report.update(report['plateScopes']['jp'])
         report['calculation']['plateScope'] = 'JP current / KarenBot CN requirements / JP historical; reference progress only'
-        report['privateCatalog'] = private_view(payload['best'], charts, self.db.private_charts(), self.lxns.catalog())
-        report['b50Views'] = self.lxns.b50_views(payload, display_catalog(charts, self.db.private_charts()))
+        report['privateCatalog'] = private_view(payload['best'], charts, [], registry.cn_index)
+        report['privateCatalog']['referenceCharts']=len(charts)
+        report['b50Views'] = self.lxns.b50_views(payload, charts)
         report['recommendations'] = recommendations(report['best'])
+        report['recommendationScopes'] = scopes
+        report['catalogInfo']={'source':'统一曲库','privateCharts':len(charts),'cnCharts':len(registry.charts('cn'))}
         return report
 
-    def library(self, user_id, **filters):
+    def recommendation_scopes(self,payload,private_version=None,registry=None):
+        registry=registry or self.shared_catalog()
+        return {'private':private_recommendations(payload,registry.charts('private'),[],[],private_version),
+                'cn':cn_recommendations(payload,registry.cn_index,registry.cn_versions,registry.charts('cn'))}
+
+    def library(self, user_id, scope='all', **filters):
         payload = self.db.player(user_id) or {'best': []}
-        return filter_library(library_rows(self.db.charts(), self.db.private_charts(), payload['best']), **filters)
+        return filter_library(library_rows(self.catalog(scope), [], payload['best']), **filters)

@@ -131,9 +131,9 @@ class ReportCanvas(QWidget):
         self.text(p,(x+89,y+35,141,27),f"{r['achievements']:.4f}%",22,bold=True)
         p.restore()
         ds=r.get('ds');ra=r.get('ra');label=f"{ds if ds is not None else '—'}→{ra if ra is not None else '—'}"
-        self.text(p,(x+90,y+64,70,22),label,11,COLORS[index],True)
+        self.text(p,(x+90,y+64,60,22),label,11,COLORS[index],True)
         rank=rating(1,r['achievements'])[1]
-        self.sprite(p,'rating-rank_'+rank+'.png',(x+162,y+67.5,30,15))
+        self.sprite(p,'rating-rank_'+rank+'.png',(x+152,y+66,40,18))
         for offset,key in [(194,'fc'),(212,'fs')]:self.sprite(p,'rating-icon_'+(r.get(key) or 'none')+'.png',(x+offset,y+67,16,16))
         self.hitboxes.append((QRectF(x,y,238,92),mid,f"{title}\n{r.get('difficulty','')} · 达成率 {r['achievements']:.4f}%\n参考定数 {ds if ds is not None else '待核实'} · Rating {ra if ra is not None else '缺定数'}\nFC {r.get('fc') or '—'} / FS {r.get('fs') or '—'}"))
 
