@@ -2,7 +2,7 @@
 from pathlib import Path
 root = Path(SPECPATH)
 datas = [(str(root / 'data' / name), 'data') for name in
-         ['music_data.json', 'private_music_data.json', 'lxns_song_list.json', 'karen_courses.json']]
+         ['music_data.json', 'private_music_data.json', 'plate_catalogs.json', 'lxns_song_list.json', 'karen_courses.json']]
 datas.append((str(root/'docs/KarenBot-LICENSE.txt'), 'licenses'))
 datas.append((str(root/'docs/KarenBot-Resources-LICENSE.txt'), 'licenses'))
 datas.append((str(root/'data/report_assets'), 'data/report_assets'))

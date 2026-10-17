@@ -13,7 +13,7 @@ def canonical_version(value):
         return 'maimai でらっくす' + (' ' + suffix if suffix else '')
     short = compact.removeprefix('maimai ')
     if short in OLD[2:]:
-        return short if short == 'MiLK PLUS' else 'maimai ' + short
+        return 'maimai ' + short
     if short in DX[2:]:
         return 'maimai でらっくす ' + short
     return value

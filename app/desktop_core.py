@@ -11,6 +11,7 @@ from app.private_catalog import private_view, display_catalog
 from app.local_tools import library_rows, filter_library, recommendations
 from app.lxns import LxnsService
 from app.desktop_storage import default_settings_path,configured_directory,copy_profile,save_directory
+from app.plate_catalogs import load_plate_catalogs, SCOPE_KEYS, SCOPE_LABELS
 
 ASSETS = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[1]))
 
@@ -30,6 +31,7 @@ class DesktopCore:
             shutil.copyfile(ASSETS/'data/lxns_song_list.json', target)
         self.lxns = LxnsService(target, backup_path=self.db.path)
         self.courses = json.loads((ASSETS/'data/karen_courses.json').read_text(encoding='utf8'))
+        self.plate_catalogs = load_plate_catalogs(ASSETS/'data/plate_catalogs.json')
 
     def migrate_directory(self,directory):
         target=Path(directory).expanduser().resolve()
@@ -58,10 +60,14 @@ class DesktopCore:
         report = summarize(payload, charts)
         # Plate coverage uses the complete reference catalog, independently of B50.
         report['analysisPlates'] = report['plates']
-        report['plateCatalog'] = display_catalog(charts, self.db.private_charts())
-        report['plateScopeLabel'] = '完整私服参考曲库'
-        report['plates'] = plate_progress(payload['best'], report['plateCatalog'])
-        report['calculation']['plateScope'] = 'merged JP reference catalog; not proof of server-awarded plates'
+        report['plateScopes'] = {}
+        for key, label in zip(SCOPE_KEYS, SCOPE_LABELS):
+            scope = self.plate_catalogs['scopes'][key]
+            report['plateScopes'][key] = dict(plateCatalog=scope['charts'], plateRequirements=scope.get('requirements'),
+                plateScopeLabel=label, plateDescription=scope['description'],
+                plates=plate_progress(payload['best'], scope['charts'], scope.get('requirements')))
+        report.update(report['plateScopes']['jp'])
+        report['calculation']['plateScope'] = 'JP current / KarenBot CN requirements / JP historical; reference progress only'
         report['privateCatalog'] = private_view(payload['best'], charts, self.db.private_charts(), self.lxns.catalog())
         report['b50Views'] = self.lxns.b50_views(payload, display_catalog(charts, self.db.private_charts()))
         report['recommendations'] = recommendations(report['best'])

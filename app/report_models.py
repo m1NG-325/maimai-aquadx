@@ -2,7 +2,7 @@
 from collections import defaultdict
 from app.calculations import OLD_VERSIONS
 from app.versions import OLD,DX,canonical_version
-from app.calculations import rating
+from app.calculations import rating, plate_required
 
 PLATE_WORDS={canonical_version(v):word for v,word in zip(OLD+DX,
     ['真','真','超','檄','橙','暁','桃','櫻','紫','菫','白','雪','輝','熊','華','爽','煌','宙','星','祭','祝','双','宴','鏡','彩','丸','廻'])}
@@ -28,13 +28,7 @@ def b50_report(data, view, catalog, label):
 def plate_report(data, charts, version, mark, difficulty=3, only_missing=False):
     progress=data['plates'][version][mark]
     charts=data.get('plateCatalog',charts)
-    standard=[c for c in charts if c['music_id']<100000 and c['level_index']<5]
-    if version=='真':
-        required=[c for c in standard if c['version'] in ('maimai','maimai PLUS') and c['music_id']!=70 and c['level_index']<4]
-    elif version=='舞':
-        required=[c for c in standard if c['version'] in OLD_VERSIONS]
-    else:
-        required=[c for c in standard if c['version']==version and c['level_index']<4]
+    required=plate_required(charts,version,mark,data.get('plateRequirements'))
     missing={(r['musicId'],r['level']) for r in progress['missing']}
     counts=[]
     for level in (4,3,2,1,0):
@@ -52,4 +46,4 @@ def plate_report(data, charts, version, mark, difficulty=3, only_missing=False):
     return dict(title=PLATE_WORDS.get(version,version)+mark+'完成表',version=version,mark=mark,difficulty=difficulty,
                 supported=progress['supported'],counts=counts,completed=progress['completed'],total=progress['total'],
                 groups=[{'level':level,'charts':sorted(rows,key=lambda c:c['music_id'])} for level,rows in sorted(groups.items(),key=lambda x:-order(x[0]))],
-                onlyMissing=only_missing,scopeLabel=data.get('plateScopeLabel','原分析曲库'))
+                onlyMissing=only_missing,scopeLabel=data.get('plateScopeLabel','国服曲库'))

@@ -1,0 +1,974 @@
+[
+    {
+        "id": 551001,
+        "name": "初段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 10256,
+                "name": "いーあるふぁんくらぶ",
+                "difficulty": 0
+            },
+            {
+                "id": 11052,
+                "name": "グリーンライツ・セレナーデ",
+                "difficulty": 0
+            },
+            {
+                "id": 10319,
+                "name": "幻想のサテライト",
+                "difficulty": 0
+            },
+            {
+                "id": 617,
+                "name": "オトヒメモリー☆ウタゲーション",
+                "difficulty": 0
+            }
+        ],
+        "life": 350,
+        "recover": 20,
+        "damage": {
+            "perfect": 0,
+            "great": 0,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551002,
+        "name": "二段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11764,
+                "name": "唱",
+                "difficulty": 1
+            },
+            {
+                "id": 11136,
+                "name": "Oath Act",
+                "difficulty": 1
+            },
+            {
+                "id": 11265,
+                "name": "Alice in 冷凍庫",
+                "difficulty": 1
+            },
+            {
+                "id": 11697,
+                "name": "ラビットホール",
+                "difficulty": 1
+            }
+        ],
+        "life": 350,
+        "recover": 20,
+        "damage": {
+            "perfect": 0,
+            "great": 0,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551003,
+        "name": "三段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11701,
+                "name": "さよならヒストリー",
+                "difficulty": 1
+            },
+            {
+                "id": 11411,
+                "name": "エンヴィーベイビー",
+                "difficulty": 1
+            },
+            {
+                "id": 11491,
+                "name": "Luminaria",
+                "difficulty": 1
+            },
+            {
+                "id": 11638,
+                "name": "星界ちゃんと可不ちゃんのおつかい合騒曲",
+                "difficulty": 1
+            }
+        ],
+        "life": 600,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 1,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551004,
+        "name": "四段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11698,
+                "name": "酔いどれ知らず",
+                "difficulty": 2
+            },
+            {
+                "id": 11276,
+                "name": "今、誰が為のかがり火へ",
+                "difficulty": 2
+            },
+            {
+                "id": 10535,
+                "name": "色は匂へど散りぬるを",
+                "difficulty": 2
+            },
+            {
+                "id": 417,
+                "name": "ウミユリ海底譚",
+                "difficulty": 2
+            }
+        ],
+        "life": 700,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551005,
+        "name": "五段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 579,
+                "name": "ポップミュージックは僕のもの",
+                "difficulty": 2
+            },
+            {
+                "id": 11003,
+                "name": "でらっくmaimai♪てんてこまい!",
+                "difficulty": 2
+            },
+            {
+                "id": 11333,
+                "name": "Southern Cross",
+                "difficulty": 2
+            },
+            {
+                "id": 11770,
+                "name": "Ultimate taste",
+                "difficulty": 2
+            }
+        ],
+        "life": 700,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551006,
+        "name": "六段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 439,
+                "name": "最終鬼畜妹・一部声",
+                "difficulty": 2
+            },
+            {
+                "id": 11405,
+                "name": "エータ・ベータ・イータ",
+                "difficulty": 2
+            },
+            {
+                "id": 432,
+                "name": "幸せになれる隠しコマンドがあるらしい",
+                "difficulty": 2
+            },
+            {
+                "id": 11272,
+                "name": "約束",
+                "difficulty": 3
+            }
+        ],
+        "life": 700,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551007,
+        "name": "七段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11271,
+                "name": "再会",
+                "difficulty": 3
+            },
+            {
+                "id": 634,
+                "name": "GET!! 夢&DREAM",
+                "difficulty": 3
+            },
+            {
+                "id": 11580,
+                "name": "解けないように",
+                "difficulty": 3
+            },
+            {
+                "id": 11767,
+                "name": "デビルじゃないもん",
+                "difficulty": 3
+            }
+        ],
+        "life": 700,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551008,
+        "name": "八段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11017,
+                "name": "福宿音屋魂音泉",
+                "difficulty": 3
+            },
+            {
+                "id": 11048,
+                "name": "ナイト・オブ・ナイツ (Cranky Remix)",
+                "difficulty": 3
+            },
+            {
+                "id": 11615,
+                "name": "ぽわわん劇場",
+                "difficulty": 3
+            },
+            {
+                "id": 11512,
+                "name": "きゅうくらりん",
+                "difficulty": 3
+            }
+        ],
+        "life": 700,
+        "recover": 20,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551009,
+        "name": "九段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11699,
+                "name": "新人類",
+                "difficulty": 3
+            },
+            {
+                "id": 11141,
+                "name": "energy trixxx",
+                "difficulty": 3
+            },
+            {
+                "id": 798,
+                "name": "セイクリッド　ルイン",
+                "difficulty": 3
+            },
+            {
+                "id": 11496,
+                "name": "Destiny Runner",
+                "difficulty": 3
+            }
+        ],
+        "life": 800,
+        "recover": 30,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551010,
+        "name": "十段",
+        "mode": 1,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 840,
+                "name": "Imperishable Night 2006 (2016 Refine)",
+                "difficulty": 3
+            },
+            {
+                "id": 11207,
+                "name": "Ether Strike",
+                "difficulty": 3
+            },
+            {
+                "id": 11412,
+                "name": "初音天地開闢神話",
+                "difficulty": 3
+            },
+            {
+                "id": 227,
+                "name": "Garakuta Doll Play",
+                "difficulty": 3
+            }
+        ],
+        "life": 900,
+        "recover": 30,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551101,
+        "name": "真初段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11010,
+                "name": "STARTLINER",
+                "difficulty": 3
+            },
+            {
+                "id": 11133,
+                "name": "Catch the Wave",
+                "difficulty": 3
+            },
+            {
+                "id": 759,
+                "name": "サドマミホリック",
+                "difficulty": 3
+            },
+            {
+                "id": 136,
+                "name": "Streak",
+                "difficulty": 2
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551102,
+        "name": "真二段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 791,
+                "name": "ロールプレイングゲーム",
+                "difficulty": 3
+            },
+            {
+                "id": 11199,
+                "name": "悪戯センセーション",
+                "difficulty": 3
+            },
+            {
+                "id": 191,
+                "name": "脳漿炸裂ガール",
+                "difficulty": 2
+            },
+            {
+                "id": 11532,
+                "name": "ヱデン",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551103,
+        "name": "真三段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11599,
+                "name": "まにまに",
+                "difficulty": 3
+            },
+            {
+                "id": 794,
+                "name": "Money Money",
+                "difficulty": 3
+            },
+            {
+                "id": 239,
+                "name": "System “Z”",
+                "difficulty": 2
+            },
+            {
+                "id": 709,
+                "name": "アウターサイエンス",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551104,
+        "name": "真四段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11715,
+                "name": "ライアーダンサー",
+                "difficulty": 3
+            },
+            {
+                "id": 581,
+                "name": "ねぇ、壊れタ人形ハ何処へ棄テらレるノ？",
+                "difficulty": 2
+            },
+            {
+                "id": 204,
+                "name": "ナイト・オブ・ナイツ",
+                "difficulty": 3
+            },
+            {
+                "id": 453,
+                "name": "Garden Of The Dragon",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551105,
+        "name": "真五段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11583,
+                "name": "インターネットサバイバー",
+                "difficulty": 3
+            },
+            {
+                "id": 11653,
+                "name": "ULTRA POWER",
+                "difficulty": 3
+            },
+            {
+                "id": 448,
+                "name": "ありふれたせかいせいふく",
+                "difficulty": 3
+            },
+            {
+                "id": 673,
+                "name": "咲キ誇レ常世ノ華",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551106,
+        "name": "真六段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11316,
+                "name": "We Are Us",
+                "difficulty": 3
+            },
+            {
+                "id": 11710,
+                "name": "サイバーサンダーサイダー",
+                "difficulty": 3
+            },
+            {
+                "id": 11177,
+                "name": "レーイレーイ",
+                "difficulty": 4
+            },
+            {
+                "id": 700,
+                "name": "疾走あんさんぶる",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551107,
+        "name": "真七段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11460,
+                "name": "Neon Kingdom",
+                "difficulty": 3
+            },
+            {
+                "id": 11208,
+                "name": "Cyaegha",
+                "difficulty": 3
+            },
+            {
+                "id": 451,
+                "name": "頓珍漢の宴",
+                "difficulty": 3
+            },
+            {
+                "id": 11413,
+                "name": "Armageddon",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551108,
+        "name": "真八段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 766,
+                "name": "アマノジャクリバース feat. ｙｔｒ",
+                "difficulty": 3
+            },
+            {
+                "id": 11213,
+                "name": "Arty Party",
+                "difficulty": 3
+            },
+            {
+                "id": 24,
+                "name": "Sun Dance",
+                "difficulty": 4
+            },
+            {
+                "id": 556,
+                "name": "夜明けまであと３秒",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551109,
+        "name": "真九段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11675,
+                "name": "勦滅",
+                "difficulty": 3
+            },
+            {
+                "id": 11618,
+                "name": "Energizing Flame",
+                "difficulty": 3
+            },
+            {
+                "id": 589,
+                "name": "Panopticon",
+                "difficulty": 4
+            },
+            {
+                "id": 11687,
+                "name": "MarbleBlue.",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551110,
+        "name": "真十段",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11295,
+                "name": "脳天直撃",
+                "difficulty": 3
+            },
+            {
+                "id": 11026,
+                "name": "TEmPTaTiON",
+                "difficulty": 3
+            },
+            {
+                "id": 11470,
+                "name": "康莊大道",
+                "difficulty": 3
+            },
+            {
+                "id": 11619,
+                "name": "KHYMΞXΛ",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 10,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551111,
+        "name": "真皆伝",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 11223,
+                "name": "Heavenly Blast",
+                "difficulty": 3
+            },
+            {
+                "id": 11745,
+                "name": "氷滅の135小節",
+                "difficulty": 3
+            },
+            {
+                "id": 11311,
+                "name": "躯樹の墓守",
+                "difficulty": 3
+            },
+            {
+                "id": 11753,
+                "name": "宙天",
+                "difficulty": 3
+            }
+        ],
+        "life": 50,
+        "recover": 5,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    },
+    {
+        "id": 551112,
+        "name": "裏皆伝",
+        "mode": 2,
+        "random": false,
+        "lower": 0.0,
+        "upper": 0.0,
+        "musics": [
+            {
+                "id": 834,
+                "name": "PANDORA PARADOXXX",
+                "difficulty": 4
+            },
+            {
+                "id": 11612,
+                "name": "Latent Kingdom",
+                "difficulty": 3
+            },
+            {
+                "id": 11662,
+                "name": "raputa",
+                "difficulty": 3
+            },
+            {
+                "id": 11663,
+                "name": "系ぎて",
+                "difficulty": 4
+            }
+        ],
+        "life": 10,
+        "recover": 0,
+        "damage": {
+            "perfect": 0,
+            "great": 1,
+            "good": 3,
+            "miss": 10
+        }
+    },
+    {
+        "id": 552201,
+        "name": "EXPERT初級",
+        "mode": 3,
+        "random": true,
+        "lower": 7.0,
+        "upper": 9.6,
+        "musics": [],
+        "life": 700,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552202,
+        "name": "EXPERT中級",
+        "mode": 3,
+        "random": true,
+        "lower": 9.7,
+        "upper": 11.6,
+        "musics": [],
+        "life": 600,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552203,
+        "name": "EXPERT上級",
+        "mode": 3,
+        "random": true,
+        "lower": 11.7,
+        "upper": 12.6,
+        "musics": [],
+        "life": 500,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552204,
+        "name": "EXPERT超上級",
+        "mode": 3,
+        "random": true,
+        "lower": 12.7,
+        "upper": 13.9,
+        "musics": [],
+        "life": 400,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552301,
+        "name": "MASTER初級",
+        "mode": 3,
+        "random": true,
+        "lower": 10.0,
+        "upper": 11.9,
+        "musics": [],
+        "life": 700,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552302,
+        "name": "MASTER中級",
+        "mode": 3,
+        "random": true,
+        "lower": 12.0,
+        "upper": 13.2,
+        "musics": [],
+        "life": 500,
+        "recover": 50,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552303,
+        "name": "MASTER上級",
+        "mode": 3,
+        "random": true,
+        "lower": 13.3,
+        "upper": 14.4,
+        "musics": [],
+        "life": 300,
+        "recover": 20,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 2,
+            "miss": 5
+        }
+    },
+    {
+        "id": 552304,
+        "name": "MASTER超上級",
+        "mode": 3,
+        "random": true,
+        "lower": 14.5,
+        "upper": 14.9,
+        "musics": [],
+        "life": 100,
+        "recover": 20,
+        "damage": {
+            "perfect": 0,
+            "great": 2,
+            "good": 3,
+            "miss": 5
+        }
+    }
+]

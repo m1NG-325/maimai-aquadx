@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from decimal import Decimal
 from app.parser import integer
+from app.versions import canonical_version
 
 
 class Database:
@@ -67,7 +68,7 @@ class Database:
 
     def charts(self):
         with self.connect() as db:
-            return [dict(r) for r in db.execute('SELECT * FROM charts ORDER BY music_id, level_index')]
+            return [dict(r, version=canonical_version(r['version'])) for r in db.execute('SELECT * FROM charts ORDER BY music_id, level_index')]
 
     def save_private_catalog(self, value):
         # Separate reference snapshot, never replace the export eligibility catalog.
@@ -78,7 +79,7 @@ class Database:
     def private_charts(self):
         with self.connect() as db:
             row = db.execute("SELECT value FROM metadata WHERE key='private_catalog'").fetchone()
-            return json.loads(row['value'])['charts'] if row else []
+            return [dict(c,version=canonical_version(c['version'])) for c in json.loads(row['value'])['charts']] if row else []
 
     def catalog_source(self):
         with self.connect() as db:

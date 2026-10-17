@@ -1,7 +1,7 @@
 """DX Rating, Best 35 + 15, and catalog-relative completion progress."""
 from collections import Counter, defaultdict
 from decimal import Decimal, ROUND_FLOOR
-from app.versions import version_order
+from app.versions import version_order, canonical_version
 
 COEFFICIENTS = [(0, 0, 'd'), (10, 1.6, 'd'), (20, 3.2, 'd'), (30, 4.8, 'd'),
  (40, 6.4, 'd'), (50, 8, 'c'), (60, 9.6, 'b'), (70, 11.2, 'bb'), (75, 12, 'bbb'),
@@ -11,7 +11,7 @@ COEFFICIENTS = [(0, 0, 'd'), (10, 1.6, 'd'), (20, 3.2, 'd'), (30, 4.8, 'd'),
  (100.4999, 22.2, 'sss'), (100.5, 22.4, 'sssp')]
 OLD_VERSIONS = ('maimai', 'maimai PLUS', 'maimai GreeN', 'maimai GreeN PLUS',
  'maimai ORANGE', 'maimai ORANGE PLUS', 'maimai PiNK', 'maimai PiNK PLUS',
- 'maimai MURASAKi', 'maimai MURASAKi PLUS', 'maimai MiLK', 'MiLK PLUS', 'maimai FiNALE')
+ 'maimai MURASAKi', 'maimai MURASAKi PLUS', 'maimai MiLK', 'MiLK PLUS', 'maimai MiLK PLUS', 'maimai FiNALE')
 
 
 def rating(ds, achievements):
@@ -23,6 +23,8 @@ def rating(ds, achievements):
 
 
 def enrich(records, charts, current_version=None):
+    charts = [dict(c,version=canonical_version(c['version'])) for c in charts]
+    current_version = canonical_version(current_version) if current_version is not None else None
     catalog = {(c['music_id'], c['level_index']): c for c in charts}
     if current_version is not None and current_version not in {c['version'] for c in charts}:
         raise ValueError('current_version is absent from catalog; import a matching catalog first')
@@ -57,7 +59,19 @@ def statistics(records):
             'fsMarks': dict(Counter(r['fs'] for r in records)), 'chartPlayCount': sum(r['playCount'] for r in records)}
 
 
-def plate_progress(records, charts):
+def plate_required(charts, version, mark, requirements=None):
+    standard = [c for c in charts if c['music_id'] < 100000 and c['level_index'] < 5]
+    if requirements is not None:
+        keys = {tuple(pair) for pair in requirements.get(version, {}).get(mark, [])}
+        return [c for c in standard if (c['music_id'], c['level_index']) in keys]
+    if version == '真':
+        return [c for c in standard if c['version'] in ('maimai', 'maimai PLUS') and c['music_id'] != 70 and c['level_index'] < 4]
+    if version == '舞':
+        return [c for c in standard if c['version'] in OLD_VERSIONS]
+    return [c for c in standard if c['version'] == version and c['level_index'] < 4]
+
+
+def plate_progress(records, charts, requirements=None):
     """Version plates exclude Re:MASTER; whole old-era 舞 includes it.
 
     真 groups maimai/PLUS and excludes ジングルベル (70); 真将 does not exist.
@@ -80,11 +94,11 @@ def plate_progress(records, charts):
                   '神': lambda r: r['comboStatus'] >= 3,
                   '舞舞': lambda r: r['fs'] in ('fsd', 'fsdp')}
     result = {}
-    for version in sorted(groups, key=version_order):
-        required = groups[version]
+    for version in sorted(requirements if requirements is not None else groups, key=version_order):
         progress = {}
         for mark, predicate in predicates.items():
-            supported = not (version == '真' and mark == '将')
+            required = plate_required(charts, version, mark, requirements)
+            supported = (mark in requirements[version]) if requirements is not None else not (version == '真' and mark == '将')
             missing = []
             for c in required:
                 r = scores.get((c['music_id'], c['level_index']))

@@ -391,9 +391,9 @@ class MainWindow(QMainWindow):
         if path: self.safe(lambda: Path(path).write_text(json.dumps(self.data['privateCatalog'],ensure_ascii=False,indent=2),encoding='utf8'))
 
     def make_plates(self):
-        layout = self.page('牌子进度', '默认使用完整私服参考曲库，版本从旧到新；这是参考完成进度，不代表官服授牌。可切回原分析曲库。点击曲绘查看单曲。')
+        layout = self.page('牌子进度', '私服曲库：日服现行谱面；国服曲库：可怜 bot 国服完成表；含删除曲目：日服现行与历史谱面。进度为参考，不代表游戏授牌。')
         filters=QHBoxLayout();layout.addLayout(filters)
-        self.plate_scope=QComboBox();self.plate_scope.addItems(['完整私服参考曲库','原分析曲库']);filters.addWidget(self.plate_scope)
+        self.plate_scope=QComboBox();self.plate_scope.addItems(['私服曲库','国服曲库','私服曲库（含删除曲目）']);filters.addWidget(self.plate_scope)
         self.plate_scope.currentIndexChanged.connect(self.render_plates)
         self.plate_version=QComboBox();filters.addWidget(self.plate_version)
         self.plate_mark=QComboBox();self.plate_mark.addItems(['将','极','神','舞舞']);self.plate_mark.setCurrentIndex(1);filters.addWidget(self.plate_mark)
@@ -435,10 +435,9 @@ class MainWindow(QMainWindow):
     def render_plates(self):
         if not self.data: return
         self.active_plate_data=dict(self.data)
-        self.active_plate_data['plateScopeLabel']=self.plate_scope.currentText()
-        if self.plate_scope.currentIndex()==1:
-            self.active_plate_data['plates']=self.data.get('analysisPlates',self.data['plates'])
-            self.active_plate_data['plateCatalog']=self.core.db.charts()
+        key=('jp','cn','jp_history')[self.plate_scope.currentIndex()]
+        self.active_plate_data.update(self.data['plateScopes'][key])
+        self.plate_scope.setToolTip(self.active_plate_data['plateDescription'])
         self.plate_names = list(self.active_plate_data['plates'])
         fill(self.plates, [[v]+[f"{m['completed']} / {m['total']} · {m['percent']}%" if m['supported'] else '不支持' for m in self.active_plate_data['plates'][v].values()] for v in self.plate_names])
         fill(self.plate_missing, [])
@@ -516,6 +515,9 @@ class MainWindow(QMainWindow):
 
     def song_detail(self, mid):
         rows=self.core.library(self.uid()); charts=[r for r in rows if r['music_id']%10000==mid%10000]
+        if self.nav.currentRow()==3 and hasattr(self,'active_plate_data'):
+            scores={(s['musicId'],s['level']):s for s in self.core.db.player(self.uid())['best']}
+            charts=[dict(c,difficulty=DIFFICULTIES[c['level_index']],score=scores.get((c['music_id'],c['level_index']))) for c in self.active_plate_data['plateCatalog'] if c['music_id']%10000==mid%10000]
         if self.data:
             known={(r['music_id'],r['level_index']) for r in charts}
             for score in self.data['privateCatalog']['rows']:

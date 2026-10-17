@@ -1,0 +1,14 @@
+{
+  "source": "https://github.com/realtvop/SaltMeta/tree/main/covers",
+  "retrieved": "2026-10-17",
+  "files": 1702,
+  "catalogSongs": 1499,
+  "missingCatalogCovers": [],
+  "invalidImages": [],
+  "sharedAcrossDifficulties": true,
+  "additionalSource": "https://assets2.lxns.net/maimai/jacket/{song_id}.png",
+  "plateScopeSongs": 1695,
+  "missingPlateScopeCovers": [
+    444
+  ]
+}
