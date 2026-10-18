@@ -13,3 +13,8 @@ output/
 build/
 dist/
 tests/fixtures/
+user-data/
+logs/
+.runtime/
+.tools/
+AquaSync-desktop.json

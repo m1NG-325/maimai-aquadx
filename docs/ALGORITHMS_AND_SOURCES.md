@@ -60,3 +60,17 @@
 
 
 2026-10-17：FC/FC+/AP/AP+、FS/FS+/FSD/FSD+/SYNC 和空状态图标采用 mai-kit/mai-kit 固定提交 32572f7ffc5ae8fa3cc18dab6eff590fc4d17f4d 的 packages/assets/assets/bonus 原始 80×80 透明 PNG；未放大伪造源分辨率。逐文件来源和 SHA256 见 data/report_assets/status_manifest.json；许可见 docs/MaiKit-Assets-LICENSE.txt。游戏素材权利归 SEGA 及相应权利人。
+
+
+2.0本地档案实现、日期与判定/FAST统计口径、原始Rating曲线、物品编码来源和本地XML名称快照说明，见ARCHIVE-2.0.md。源实现位于app/archive_data.py、archive_analysis.py、collection_metadata.py、archive_widgets.py、archive_ui.py；没有复制游戏程序或上游实现代码。
+
+2026-10-18：类型图标使用用户提供的中文 Topaz Wonder 超分原图 232×84，覆盖原有手绘 B50 标识及低清牌子图标。B50、双 B50 与牌子进度的显示、导出共用 ReportCanvas.paint_type_badge 并按图片比例绘制。原始参考素材来自 KarenBot-Resources 的 course/type_DX.png、type_SD.png，来源与校验见 data/report_assets/type_manifest.json；未修改用户超分图片像素。
+
+2026-10-18：地图详情和最终名牌板底板来自用户本地游戏的 Map.xml、MapTreasure.xml 与 AssetBundleImages/nameplate/ui_plate_*.ab，开发工具 tools/build_map_details.py 使用 UnityPy 提取原始 Sprite。按奖励距离选择最后一个 NamePlate 条目；226 张地图中 205 张含该奖励，205 张图片全部匹配；其余 21 张不以岛屿底图代替。路线原值见 data/map_details.json，图片映射见 data/report_assets/archive/manifest.json。距离达到不代表已经领取奖励，条件编码不推测额外含义。游戏美术权利归原权利人。
+
+2026-10-18：地图奖励图片按 MapTreasure.xml 的 Character、NamePlate、Frame、Icon 元素 ID 匹配原始 AssetBundle Sprite。挑战曲绘通过 Challenge.xml 的 Music/id 关联，MusicNew/MapTaskMusic 直接按曲目 ID 使用既有本地曲绘。生成工具 tools/build_map_details.py；688 组名牌板/背景框/头像引用均提取成功，角色使用已有图片，相关 2625 个路线节点全部匹配。称号、数值礼物等没有独立图片的条目保留文字。原始游戏资源未修改，版权归相应权利人。
+
+2026-10-18：课程挑战与登录奖励配置来源为用户本地 Course.xml、LoginBonus.xml、Ticket.xml。奖励类型与元素 ID、Ticket.xml filename 明确关联原始游戏 Sprite，固定课程按 XML musicId/difficulty 显示曲绘及导入最佳成绩；随机课程不推断实际选曲。324 个课程、72 个登录奖励参考见 data/activity_details.json；图片映射见 archive/manifest.json；工具 tools/build_activity_details.py 使用 UnityPy 提取原图。票券 UI_CMN_Tix_Icon_Free 原图由 Ticket 11001 显式引用；美术权利归原权利人。
+
+2026-10-18：收藏图像补全由 tools/build_collection_images.py 实现。按 A 版本优先级，从用户本地 AssetBundleImages 提取 1643 个头像、539 个姓名框及 575 个背景框；收藏预览按比例缩略，已有地图奖励的原尺寸提取文件保留。Plate.xml 对应 ui_plate_*，不是另一个 nameplateId 字段。27 种票券严格按 Ticket.xml filename 关联共享 Sprite。4302 个称号不是独立贴图：读取 Title.xml 的 name/str、rareType，使用原始 UI_CMN_Shougou_Normal/Bronze/Silver/Gold/Rainbow 底板，由 Qt 绘制文字预览，映射记录 renderedText=true；字体使用本机系统字体，不随包分发字体文件。全部预览与原始底板在 report_assets/archive/manifest.json 中逐项注明来源。补充 10 张 Sprite 曲绘及 2 张仅含同名 Texture2D 的曲绘，1706 个本地游戏曲绘引用均有对应资源；原有其他公开曲绘保留。无资料的 nameplateId=0 不生成虚构装扮卡；未知 ItemKind 保留原编码，不根据 ID 猜测图标。游戏美术权利归相应权利人。
+

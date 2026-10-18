@@ -46,5 +46,28 @@ def test_difficulty_backgrounds_and_course_cover_identity(tmp_path):
             w.data['recommendationScopes'][scope]['rows']=[dict(musicId=772,title='Z',difficulty='MASTER',level=3,ds=12.8,achievements=98,goal=99,targetRating=260,estimatedGain=10)]
         for k in range(2):
             w.recommend_scope.setCurrentIndex(k);w.render_recommend()
-            for j in range(6):assert w.recommend.item(0,j).background().color()==difficulty_background(3)
+            for j in range(7):assert w.recommend.item(0,j).background().color()==difficulty_background(3)
     finally:w.close();app.processEvents()
+
+
+def test_selected_difficulty_brush_is_retained_in_both_delegates():
+    from PySide6.QtGui import QPainter
+    from PySide6.QtWidgets import QTableWidget,QTableWidgetItem,QStyleOptionViewItem,QStyle
+    from PySide6.QtCore import QRect
+    from app.desktop_ui import DifficultyTableDelegate,CoverDelegate
+    app=QApplication.instance() or QApplication([])
+    table=QTableWidget(1,2)
+    try:
+        for level in (0,1,2,3,4):
+            for column in range(2):
+                item=QTableWidgetItem('');item.setBackground(difficulty_background(level));table.setItem(0,column,item)
+            for delegate in (DifficultyTableDelegate(table),CoverDelegate(Path('.'),table)):
+                image=QImage(200,60,QImage.Format.Format_ARGB32);image.fill(Qt.GlobalColor.black)
+                option=QStyleOptionViewItem();option.rect=QRect(0,0,200,60);option.widget=table
+                option.state=QStyle.StateFlag.State_Enabled|QStyle.StateFlag.State_Selected
+                painter=QPainter(image);delegate.paint(painter,option,table.model().index(0,0));painter.end()
+                # Actual painted centre keeps its chart hue; the blue selection stylesheet never wins.
+                expected=QImage(1,1,QImage.Format.Format_ARGB32);expected.fill(Qt.GlobalColor.black)
+                expected_painter=QPainter(expected);expected_painter.fillRect(expected.rect(),difficulty_background(level).lighter(126));expected_painter.end()
+                assert image.pixelColor(100,30)==expected.pixelColor(0,0)
+    finally:table.close()

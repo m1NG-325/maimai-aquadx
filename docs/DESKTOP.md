@@ -106,3 +106,6 @@ Rating 计算页现为原生彩色对照表，默认展示定数12.0～15.0，�
 
 
 当前定版为1.2：运行 `dist/v1.2/AquaSync.exe`，本地启动器已优先此版本。与正式1.1的完整对比见 `docs/CHANGELOG-1.2.md`。数据目录保持兼容。
+
+
+2.0当前本地版本：`dist/v2.0/AquaSync.exe`。新增四个完整档案入口，使用前重新导入完整AquaDX JSON；详见 `docs/ARCHIVE-2.0.md` 和 `docs/CHANGELOG-2.0.md`。

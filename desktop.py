@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--window-size', help='Self-test rendering size, such as 2560x1440')
     parser.add_argument('--preview-page', type=int, default=0)
     parser.add_argument('--preview-details', type=int, nargs='*', default=[], help='Self-test: open native song detail tabs')
+    parser.add_argument('--preview-activity',choices=['course','bonus'],help='Self-test: open an embedded course or bonus detail tab')
     parser.add_argument('--preview-floating', action='store_true', help='Self-test: detach the last song detail')
     args = parser.parse_args()
     if args.self_test:
@@ -28,6 +29,9 @@ def main():
     app.setApplicationName('AquaSync')
     from app import __version__
     app.setApplicationVersion(__version__)
+    from PySide6.QtGui import QIcon
+    from app.desktop_core import ASSETS
+    app.setWindowIcon(QIcon(str(ASSETS / 'data/report_assets/aquasync.ico')))
     if args.self_test:
         # Qt's offscreen test plugin does not discover Windows system fonts.
         from PySide6.QtGui import QFontDatabase
@@ -35,6 +39,8 @@ def main():
             file = Path(os.getenv('WINDIR', 'C:/Windows'))/'Fonts'/font
             if file.exists():
                 QFontDatabase.addApplicationFont(str(file))
+    from app.desktop_bootstrap import milestone
+    milestone('Loading data')
     core = DesktopCore(args.data_dir)
     if args.self_test and args.sample:
         core.import_file(args.sample, 'test')
@@ -43,9 +49,14 @@ def main():
         width,height=map(int,args.window_size.lower().split('x'))
         window.resize(width,height)
     window.show()
+    milestone('Main window shown')
     if args.self_test:
-        window.nav.setCurrentRow(args.preview_page)
+        window.show_page(args.preview_page)
         app.processEvents()
+        if args.preview_activity:
+            section='userCourseList' if args.preview_activity=='course' else 'userLoginBonusList'
+            window.show_page(15);window.archives.progress_tabs.setCurrentIndex(3 if args.preview_activity=='course' else 5)
+            if window.archives.progress_views[section].rows:window.archives.open_activity_detail(section,0)
         for mid in args.preview_details:window.song_detail(mid)
         app.processEvents()
         if args.preview_floating and window.detail_panels:window.detail_panels[-1].setFloating(True)
@@ -57,7 +68,10 @@ def main():
         assert window.library_table.rowCount() == 1
         window.new_game()
         assert hasattr(window, 'answer')
-        report = {'ok': True, 'native': True, 'pages': window.pages.count(),
+        report = {'ok': True, 'native': True, 'version':__version__, 'pages': window.pages.count(),
+                  'activityDetails':sum(t.count() for t in window.archives.activity_detail_tabs.values()),
+                  'archiveRows':len(window.archives.logs), 'archiveSections':len(window.archives.archive.get('present',[])),
+                  'collectionNames':sum(len(v) for v in window.archives.names.values()),
                   'players': len(core.db.users()), 'charts': len(core.db.charts()),
                   'scoreRows': len(getattr(window,'score_rows',[])), 'scoreGridRows':window.scores.rowCount(), 'rating315': True,
                   'dataDirectory': str(core.directory), 'frozen': bool(getattr(sys, 'frozen', False)),
@@ -82,14 +96,5 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        exit_code = main()
-    except Exception:
-        import traceback
-        if '--self-test' in sys.argv and '--result' in sys.argv:
-            result = Path(sys.argv[sys.argv.index('--result')+1])
-            result.write_text(json.dumps({'ok':False,'error':traceback.format_exc()},ensure_ascii=False),encoding='utf8')
-            exit_code = 1
-        else:
-            raise
-    raise SystemExit(exit_code)
+    from app.desktop_bootstrap import run
+    raise SystemExit(run())

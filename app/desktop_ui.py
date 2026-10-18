@@ -1,9 +1,10 @@
 """Native Qt widgets, without a browser or HTTP listener."""
+from app.image_assets import image_path
 import json
 import random
 from pathlib import Path
 from PySide6.QtCore import Qt, QObject, Signal, QRunnable, QThreadPool, QSize, QRect,QEvent,QTimer,QPoint
-from PySide6.QtGui import QColor,QIcon,QFontMetrics,QPixmap,QPainter,QFont,QPolygon
+from PySide6.QtGui import QColor,QIcon,QFontMetrics,QPixmap,QPainter,QFont,QPolygon,QBrush
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QComboBox, QLineEdit, QFileDialog, QMessageBox, QTableWidget,
     QTableWidgetItem, QHeaderView, QListWidget, QStackedWidget, QSplitter,
@@ -159,7 +160,19 @@ class DifficultyTableDelegate(QStyledItemDelegate):
 
     def paint_option(self,painter,styled,index):
         if index.data(Qt.ItemDataRole.BackgroundRole) is not None:
-            self.native_style.drawControl(QStyle.ControlElement.CE_ItemViewItem,styled,painter,styled.widget)
+            option=QStyleOptionViewItem(styled)
+            selected=bool(option.state & QStyle.StateFlag.State_Selected)
+            if selected:
+                option.state &= ~(QStyle.StateFlag.State_Selected|QStyle.StateFlag.State_HasFocus)
+                color=index.data(Qt.ItemDataRole.BackgroundRole).color().lighter(126)
+                option.backgroundBrush=QBrush(color)
+            self.native_style.drawControl(QStyle.ControlElement.CE_ItemViewItem,option,painter,option.widget)
+            if selected:
+                painter.save();painter.setPen(QColor('#d3dcea'));rect=option.rect.adjusted(0,0,-1,-1)
+                painter.drawLine(rect.topLeft(),rect.topRight());painter.drawLine(rect.bottomLeft(),rect.bottomRight())
+                if index.column()==0:painter.drawLine(rect.topLeft(),rect.bottomLeft())
+                if index.column()==index.model().columnCount()-1:painter.drawLine(rect.topRight(),rect.bottomRight())
+                painter.restore()
         else:
             style=styled.widget.style() if styled.widget else QApplication.style()
             style.drawControl(QStyle.ControlElement.CE_ItemViewItem,styled,painter,styled.widget)
@@ -184,8 +197,8 @@ class CoverDelegate(DifficultyTableDelegate):
         if mid is None:return super().paint(painter,option,index)
         resource=f'{mid%10000}.png'
         if resource not in self.icons:
-            path=self.cache/resource
-            if not path.exists():path=ASSETS/'data/report_assets/covers'/resource
+            path=image_path(self.cache/resource)
+            if not path.exists():path=image_path(ASSETS/'data/report_assets/covers'/resource)
             self.icons[resource]=QIcon(str(path)) if path.exists() else QIcon()
         styled=QStyleOptionViewItem(option);self.initStyleOption(styled,index)
         styled.icon=self.icons[resource];styled.decorationSize=QSize(58,58)
@@ -223,8 +236,8 @@ class ScoreCardDelegate(CoverDelegate):
         painter.drawRoundedRect(rect,9,9);painter.translate(rect.topLeft())
         resource=f"{r['musicId']%10000}.png"
         if resource not in self.icons:
-            path=self.cache/resource
-            if not path.exists():path=ASSETS/'data/report_assets/covers'/resource
+            path=image_path(self.cache/resource)
+            if not path.exists():path=image_path(ASSETS/'data/report_assets/covers'/resource)
             self.icons[resource]=QIcon(str(path))
         cover=80 if wide else 68
         if self.icons[resource].isNull():
@@ -290,6 +303,9 @@ class ScoreCardDelegate(CoverDelegate):
 class MainWindow(QMainWindow):
     def __init__(self, core):
         super().__init__()
+        with core.catalog_session():self.initialize(core)
+
+    def initialize(self,core):
         self.core, self.data, self.sid, self.plan = core, None, None, None
         self.workers = []
         self.detail_panels = []
@@ -310,9 +326,12 @@ class MainWindow(QMainWindow):
         self.button(bar, '加载成绩', self.load)
         self.metric_label = QLabel('先导入成绩，也可以直接使用曲库和计算器。'); self.metric_label.setObjectName('metric');self.metric_label.setWordWrap(True); layout.addWidget(self.metric_label)
         split = QSplitter(); layout.addWidget(split, 1)
-        self.nav = QListWidget(); self.nav.setMaximumWidth(160); split.addWidget(self.nav)
+        self.nav = QListWidget(); self.nav.setMinimumWidth(135);self.nav.setMaximumWidth(160); split.addWidget(self.nav)
         self.pages = QStackedWidget(); split.addWidget(self.pages)
         self.make_b50(); self.make_comparison(); self.make_scores(); self.make_plates(); self.make_library(); self.make_recommend(); self.make_calculator(); self.make_stats(); self.make_game(); self.make_advanced(); self.make_courses(); self.make_sync(); self.make_help()
+        from app.archive_ui import ArchivePages
+        self.archives=ArchivePages(self)
+        help_item=self.nav.takeItem(12);self.nav.addItem(help_item)
         self.nav.currentRowChanged.connect(self.switch_page)
         self.nav.setCurrentRow(0)
         self.statusBar().showMessage('本地运行 · 成绩与数据库保存在 '+str(core.directory))
@@ -323,7 +342,14 @@ class MainWindow(QMainWindow):
     def button(self, layout, text, function):
         b = QPushButton(text); b.clicked.connect(function); layout.addWidget(b); return b
 
+    def show_page(self,page):
+        for row in range(self.nav.count()):
+            if self.nav.item(row).data(Qt.ItemDataRole.UserRole)==page:self.nav.setCurrentRow(row);return
+
     def switch_page(self,index):
+        item=self.nav.item(index)
+        if item is None:return
+        index=item.data(Qt.ItemDataRole.UserRole)
         self.pages.setCurrentIndex(index)
         if index==0:
             for dock in list(self.page_hidden_details):dock.show()
@@ -379,6 +405,7 @@ class MainWindow(QMainWindow):
     def page(self, name, hint):
         self.nav.addItem(name)
         widget = QWidget(); layout = QVBoxLayout(widget); self.pages.addWidget(widget)
+        self.nav.item(self.nav.count()-1).setData(Qt.ItemDataRole.UserRole,self.pages.count()-1)
         title = QLabel(name); title.setStyleSheet('font-size:22px;font-weight:600'); layout.addWidget(title)
         label = QLabel(hint); label.setWordWrap(True); label.setStyleSheet('color:#b2c0d5;padding:3px 0'); layout.addWidget(label)
         return layout
@@ -422,8 +449,9 @@ class MainWindow(QMainWindow):
             fill(self.sync_table,[]);self.allow_lower.setChecked(False);self.allow_partial.setChecked(False)
             d = self.data; self.metric_label.setText(f"{d['player'].get('name') or self.uid()}    私服 Rating {d['player'].get('rating', '未知')}    最佳谱面 {d['statistics']['charts']}    FC / AP {d['statistics']['fcOrBetter']} / {d['statistics']['apOrBetter']}    曲名已知 {d['privateCatalog']['known']} / {d['statistics']['charts']}")
             self.render_b50(); self.render_comparison(); self.render_scores(); self.render_plates(); self.render_library(); self.render_recommend(); self.render_stats(); self.render_course()
+            self.archives.refresh()
             self.statusBar().showMessage('已加载 '+self.uid()+' · 本地查询无需联网 · 定数为公共参考')
-        self.safe(work)
+        with self.core.catalog_session():self.safe(work)
 
     def make_b50(self):
         layout = self.page('B50', '保留私服 B35 / B15 名单与原报总分；卡片显示参考定数 → 单曲 Rating。点击曲目打开软件内详情页签。')
@@ -668,7 +696,7 @@ class MainWindow(QMainWindow):
         head=QHBoxLayout();layout.addLayout(head)
         cover=QLabel();cover.setFixedSize(112,112)
         path=self.core.directory/'covers'/f'{mid%10000}.png'
-        if not path.exists():path=ASSETS/'data/report_assets/covers'/f'{mid%10000}.png'
+        if not path.exists():path=image_path(ASSETS/'data/report_assets/covers'/f'{mid%10000}.png')
         pix=QPixmap(str(path))
         if not pix.isNull():cover.setPixmap(pix.scaled(112,112,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation))
         else:cover.setText('暂无封面')
@@ -708,8 +736,9 @@ class MainWindow(QMainWindow):
         self.recommend_version_label=QLabel('私服新曲版本');controls.addWidget(self.recommend_version_label)
         self.recommend_version=QComboBox();self.recommend_version.setMinimumWidth(220);controls.addWidget(self.recommend_version);controls.addStretch()
         self.recommend_info=QLabel('导入成绩后可分别查看两种口径。');self.recommend_info.setWordWrap(True);layout.addWidget(self.recommend_info)
-        self.recommend=table(['曲目 / 难度','定数','当前达成率','目标达成率','目标 Rating','估算收益']);layout.addWidget(self.recommend)
+        self.recommend=table(['曲目','难度','定数','当前达成率','目标达成率','目标 Rating','估算收益']);layout.addWidget(self.recommend)
         sortable(self.recommend)
+        self.recommend.horizontalHeader().setSectionResizeMode(0,QHeaderView.ResizeMode.Interactive);self.recommend.setColumnWidth(0,270)
         self.recommend_scope.currentIndexChanged.connect(self.render_recommend)
         self.recommend_version.currentTextChanged.connect(self.change_recommend_version)
 
@@ -736,11 +765,11 @@ class MainWindow(QMainWindow):
         rows=scope['rows'];self.recommend.setSortingEnabled(False);self.recommend.setUpdatesEnabled(False)
         self.recommend.setRowCount(len(rows))
         for i,r in enumerate(rows):
-            values=[(f"{r['title']} · {r['difficulty']}",r['title'].casefold()),(r['ds'],r['ds']),
+            values=[(r['title'],r['title'].casefold()),(r['difficulty'],r.get('level',DIFFICULTIES.index(r['difficulty']))),(r['ds'],r['ds']),
                     (f"{r['achievements']:.4f}%",r['achievements']),(f"{r['goal']}%",r['goal']),
                     (r['targetRating'],r['targetRating']),(f"+{r['estimatedGain']}",r['estimatedGain'])]
             for j,(text,key) in enumerate(values):
-                item=SortItem(text,key);item.setToolTip(str(text));item.setForeground(QColor(color));item.setBackground(difficulty_background(r.get('level',DIFFICULTIES.index(r['difficulty']))));self.recommend.setItem(i,j,item)
+                item=SortItem(text,key);item.setToolTip(str(text));item.setTextAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter if j==0 else Qt.AlignmentFlag.AlignCenter);item.setForeground(QColor(color));item.setBackground(difficulty_background(r.get('level',DIFFICULTIES.index(r['difficulty']))));self.recommend.setItem(i,j,item)
         cover_icons(self.recommend,[r['musicId'] for r in rows],self.core.directory/'covers')
         self.recommend.setSortingEnabled(True);self.recommend.setUpdatesEnabled(True)
 
@@ -808,55 +837,85 @@ class MainWindow(QMainWindow):
         self.calc_label.setText(f"{value} · {labels.get(rank,rank.upper())}")
 
     def make_stats(self):
-        layout=self.page('成绩统计','统计最佳成绩；累计次数不是出勤日历。')
-        self.stats=table(['项目','数量']); layout.addWidget(self.stats)
+        from app.stats_dashboard import StatsDashboard
+        layout=self.page('成绩统计','已导入最佳成绩概览 · 评级、难度与完成标记；累计次数不等于出勤天数。')
+        self.stats=StatsDashboard();layout.addWidget(self.stats,1)
 
     def render_stats(self):
-        s=self.data['statistics']; fill(self.stats,[['最佳谱面',s['charts']],['累计游玩',s['chartPlayCount']],['FC 及以上',s['fcOrBetter']],['AP 及以上',s['apOrBetter']]]+[[m or '无 FC',n] for m,n in s['marks'].items()]+[[m or '无 FS',n] for m,n in s['fsMarks'].items()])
+        if self.data:self.stats.set_data(self.data)
 
     def make_game(self):
         layout=self.page('猜歌 / 开字母','本地文字猜歌：随机抽取曲库曲名，开字母显示匹配位置；支持完整曲名作答。')
-        self.game_label=QLabel('点击新游戏开始'); self.game_label.setWordWrap(True); self.game_label.setStyleSheet('font-size:22px;color:#78e5d5'); layout.addWidget(self.game_label)
-        self.game_hint=QLabel(); layout.addWidget(self.game_hint)
-        self.game_input=QLineEdit(); self.game_input.setPlaceholderText('输入一个字母或完整曲名'); layout.addWidget(self.game_input)
-        buttons=QHBoxLayout(); layout.addLayout(buttons)
-        self.button(buttons,'新游戏',self.new_game); self.button(buttons,'开字母 / 答题',self.answer_game); self.button(buttons,'提示',self.hint_game); self.button(buttons,'揭晓',lambda:self.game_label.setText(getattr(self,'answer',{}).get('title','尚未开始'))); layout.addStretch()
+        from app.tool_pages import game_page
+        game_page(self,layout)
+
+    def reveal_game(self):
+        if not hasattr(self,'answer'):return
+        self.game_finished=True
+        self.game_label.setText(self.answer['title'])
+        self.game_status.setText('答案已揭晓')
+        self.game_hint.setText('可以点击“新的一局”继续挑战。')
 
     def new_game(self):
         choices=list({r['music_id']:r for r in self.core.library(self.uid())}.values())
         if not choices:return
-        self.answer=random.choice(choices); self.opened=set(); self.hints=0; self.game_hint.setText(''); self.mask_game()
+        self.answer=random.choice(choices); self.opened=set(); self.hints=0; self.game_finished=False
+        self.game_input.clear();self.game_status.setText('猜歌进行中');self.game_opened.setText('已开字符：—')
+        self.game_hint.setText('试着输入一个字符，或者直接猜完整曲名。');self.mask_game();self.game_input.setFocus()
 
     def mask_game(self):
         self.game_label.setText(' '.join(c if c.isspace() or c.casefold() in self.opened else '□' for c in self.answer['title']))
 
     def answer_game(self):
-        if not hasattr(self,'answer'):return
-        value=self.game_input.text().strip().casefold(); self.game_input.clear()
-        if value==self.answer['title'].casefold():self.game_label.setText('答对了！ '+self.answer['title'])
-        elif len(value)==1:self.opened.add(value);self.mask_game()
+        if not hasattr(self,'answer') or self.game_finished:return
+        value=self.game_input.text().strip().casefold();self.game_input.clear()
+        if not value:return
+        if value==self.answer['title'].casefold():
+            self.game_finished=True;self.game_label.setText('答对了！ '+self.answer['title'])
+            self.game_status.setText('回答正确');self.game_hint.setText('答对了！点击“新的一局”继续挑战。')
+        elif len(value)==1:
+            repeated=value in self.opened;self.opened.add(value);self.mask_game()
+            self.game_opened.setText('已开字符：'+'  ·  '.join(sorted(self.opened)))
+            self.game_hint.setText('这个字符已经开过了。' if repeated else
+                ('发现了匹配的字符！' if value in self.answer['title'].casefold() else '曲名中没有这个字符，再试一个。'))
         else:self.game_hint.setText('答案不对，可以继续开字母。')
 
     def hint_game(self):
-        if not hasattr(self,'answer'):return
+        if not hasattr(self,'answer') or self.game_finished:return
         hints=[self.answer['version'],f"谱面类型 {self.answer['type']}",f"曲名长度 {len(self.answer['title'])}",f"musicId {self.answer['music_id']}"]
         self.game_hint.setText(hints[min(self.hints,len(hints)-1)]);self.hints+=1
 
     def make_advanced(self):
         layout=self.page('进阶查分工具','分数线容错、今日舞萌、条件完成表和自选 Best 列表。公式和筛选功能参照 KarenBot 的公开舞萌模块，定数及物量仍为参考。')
-        first=QHBoxLayout();layout.addLayout(first)
-        self.line_id=QLineEdit('772');self.line_id.setPlaceholderText('musicId');first.addWidget(self.line_id)
-        self.line_diff=QComboBox();self.line_diff.addItems(list(DIFFICULTIES));self.line_diff.setCurrentIndex(2);first.addWidget(self.line_diff)
-        self.line_goal=QDoubleSpinBox();self.line_goal.setRange(0,101);self.line_goal.setDecimals(4);self.line_goal.setValue(100.5);first.addWidget(self.line_goal)
-        self.button(first,'分数线容错',self.calc_score_line);self.button(first,'今日舞萌',self.today)
-        self.advanced_info=QLabel('输入曲目 ID 和目标达成率计算 TAP GREAT / BREAK 50 落容错。');self.advanced_info.setWordWrap(True);layout.addWidget(self.advanced_info)
-        second=QHBoxLayout();layout.addLayout(second)
-        self.advanced_query=QLineEdit();self.advanced_query.setPlaceholderText('曲名、版本、谱师或曲师关键词');second.addWidget(self.advanced_query)
-        self.advanced_goal=QComboBox();self.advanced_goal.addItems(['FC','AP','FSD','SSS','SSS+']);second.addWidget(self.advanced_goal)
-        self.button(second,'条件完成 / 未完成表',self.advanced_completion)
-        self.best_mark=QComboBox();self.best_mark.addItems(['全部成绩','FC','AP']);second.addWidget(self.best_mark)
-        self.button(second,'自选 Best 50',self.advanced_best)
-        self.advanced_table=table(['曲目','难度','定数参考','成绩 / 状态','说明']);layout.addWidget(self.advanced_table)
+        from app.tool_pages import advanced_page
+        advanced_page(self,layout,table)
+
+    def switch_advanced(self,index):
+        self.advanced_result_title.setText(['计算结果','今日推荐','完成情况','Best 列表'][index])
+        self.advanced_info.setText([
+            '输入曲目 ID、难度和目标达成率，点击“计算容错”。',
+            '点击“查看今日推荐”，获取今天的幸运指数和推荐曲目。',
+            '设置关键词与完成目标后，点击“查看未完成谱面”。',
+            '设置关键词与完成标记后，点击“生成 Best 50”。'][index])
+        self.advanced_table.setRowCount(0)
+        self.advanced_table.setVisible(index>=2)
+        self.advanced_empty.setVisible(index>=2)
+        self.advanced_empty.setText('暂无查询结果，请先运行上方工具。')
+        self.advanced_spacer.setVisible(index<2)
+
+    def decorate_advanced(self,rows):
+        for i,row in enumerate(rows):
+            for j in range(self.advanced_table.columnCount()):
+                item=self.advanced_table.item(i,j)
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter if j else Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+                item.setBackground(difficulty_background(row.get('level_index',row.get('level',0))))
+        cover_icons(self.advanced_table,[r.get('music_id',r.get('musicId')) for r in rows],self.core.directory/'covers')
+        self.advanced_empty.setVisible(not rows)
+        self.advanced_empty.setText('没有符合当前条件的谱面。' if not rows else '')
+        header=self.advanced_table.horizontalHeader()
+        header.setSectionResizeMode(0,QHeaderView.ResizeMode.Stretch)
+        for j,width in [(1,125),(2,90),(3,135),(4,150)]:
+            header.setSectionResizeMode(j,QHeaderView.ResizeMode.Interactive);self.advanced_table.setColumnWidth(j,width)
 
     def calc_score_line(self):
         def work():
@@ -881,20 +940,23 @@ class MainWindow(QMainWindow):
         rows=self.advanced_rows();goal=self.advanced_goal.currentText();result=completion(rows,goal)
         self.advanced_info.setText(f"{goal} 完成 {result['completed']} / {result['total']}，以下为未完成谱面。分母为参考库筛选结果。")
         fill(self.advanced_table,[[r['title'],r['difficulty'],r['ds'],f"{r['score']['achievements']:.4f}%" if r['score'] else '未玩',r.get('designer') or '—'] for r in result['missing']])
+        self.decorate_advanced(result['missing'])
 
     def advanced_best(self):
-        if not self.data:return
+        if not self.data:
+            self.advanced_info.setText('请先导入并加载成绩，再生成 Best 列表。');return
         mark=self.best_mark.currentText() if self.best_mark.currentIndex() else ''
-        rows=custom_best(self.data['best'],mark=mark);query=self.advanced_query.text().strip().casefold()
+        rows=custom_best(self.data['best'],mark=mark);query=self.best_query.text().strip().casefold()
         rows=[r for r in rows if not query or query in (r['title'] or '').casefold() or query in (r['version'] or '').casefold()]
         self.advanced_info.setText(f"自选 Best 列表 {len(rows)} 张，未强制 B35/B15 分组，不代表游戏正式 B50。")
         fill(self.advanced_table,[[r['title'],r['difficulty'],r['ds'],f"{r['achievements']:.4f}%",f"Rating {r['ra']}"] for r in rows])
+        self.decorate_advanced(rows)
 
     def make_courses(self):
         layout=self.page('段位表','段位配置来自 KarenBot 公开资源，具体版本可能与私服不同。展示配置和单曲最佳成绩，不据此判定实际段位合格。')
         self.course_choice=QComboBox();self.course_choice.addItems([c['name'] for c in self.core.courses]);self.course_choice.currentIndexChanged.connect(self.render_course);layout.addWidget(self.course_choice)
         self.course_info=QLabel();self.course_info.setWordWrap(True);layout.addWidget(self.course_info)
-        self.course_table=table(['曲目','難度','ID','单曲最佳','FC / FS']);layout.addWidget(self.course_table)
+        self.course_table=table(['曲目','难度','定数','ID','单曲最佳','FC / FS']);layout.addWidget(self.course_table)
         self.course_table.cellDoubleClicked.connect(lambda row,col:self.song_detail(self.course_table.item(row,0).data(Qt.ItemDataRole.UserRole)))
         self.render_course()
 
@@ -904,14 +966,17 @@ class MainWindow(QMainWindow):
         if c['random']:info+=f"\n随机段位：定数范围 {c['lower']}..{c['upper']}，实际选曲由游戏决定。"
         self.course_info.setText(info)
         lookup={(r['musicId'],r['level']):r for r in self.data['best']} if self.data else {}
+        catalog={(r['music_id'],r['level_index']):r for r in self.core.catalog('private')}
         rows=[]
         for m in c['musics']:
             r=lookup.get((m['id'],m['difficulty']))
-            rows.append([m['name'] or 'ID '+str(m['id']),DIFFICULTIES[m['difficulty']] if m['difficulty']<5 else '特殊',m['id'],f"{r['achievements']:.4f}%" if r else '未玩',f"{r['fc'] or '—'} / {r['fs'] or '—'}" if r else '—'])
+            ds=catalog.get((m['id'],m['difficulty']),{}).get('ds')
+            rows.append([m['name'] or 'ID '+str(m['id']),DIFFICULTIES[m['difficulty']] if m['difficulty']<5 else '特殊',str(ds) if ds is not None else '待核实',m['id'],f"{r['achievements']:.4f}%" if r else '未玩',f"{r['fc'] or '—'} / {r['fs'] or '—'}" if r else '—'])
         fill(self.course_table,rows)
         for i,m in enumerate(c['musics']):
             for j in range(self.course_table.columnCount()):
                 self.course_table.item(i,j).setBackground(difficulty_background(m['difficulty']))
+                self.course_table.item(i,j).setTextAlignment(Qt.AlignmentFlag.AlignCenter if j else Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
         cover_icons(self.course_table,[m['id'] for m in c['musics']],self.core.directory/'covers')
 
     def make_sync(self):

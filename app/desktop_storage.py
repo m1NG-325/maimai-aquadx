@@ -6,12 +6,32 @@ import shutil
 import sqlite3
 import tempfile
 import uuid
+import sys
 from contextlib import closing
 from pathlib import Path
 
 
+def installation_directory():
+    return Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else Path(__file__).resolve().parents[1]
+
+
 def default_settings_path():
-    return Path(os.getenv('LOCALAPPDATA',Path.home()))/'AquaSync-desktop.json'
+    return installation_directory()/'AquaSync-desktop.json'
+
+
+def default_profile():
+    settings=default_settings_path()
+    if settings.exists():return configured_directory(settings)
+    target=installation_directory()/'user-data'
+    legacy_root=Path(os.getenv('LOCALAPPDATA',Path.home()))
+    legacy_settings=legacy_root/'AquaSync-desktop.json'
+    legacy=configured_directory(legacy_settings) if legacy_settings.exists() else legacy_root/'AquaSync'
+    if legacy.drive.upper()!='C:' and (legacy/'aquasync.sqlite3').exists():
+        save_directory(settings,legacy);return legacy
+    if not target.exists() and (legacy/'aquasync.sqlite3').exists():
+        copy_profile(legacy,target)
+    save_directory(settings,target)
+    return target
 
 
 def configured_directory(settings):

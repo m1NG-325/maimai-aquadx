@@ -68,3 +68,20 @@ def test_native_scope_switch_retains_sorting_and_version_choice(tmp_path):
         assert 'PRiSM PLUS' in w.recommend_info.text()
         assert core.db.player('example')==before
     finally:w.close();app.processEvents()
+
+def test_recommend_difficulty_column_and_alignment_in_both_scopes(tmp_path):
+ from PySide6.QtWidgets import QApplication
+ from PySide6.QtCore import Qt
+ from app.desktop_ui import MainWindow
+ from tests.test_archive_ui import core_with_archive
+ app=QApplication.instance() or QApplication([]);w=MainWindow(core_with_archive(tmp_path))
+ try:
+  for scope in ('private','cn'):
+   w.data['recommendationScopes'][scope]['rows']=[dict(musicId=772,title='Example',difficulty='MASTER',level=3,ds=12.8,achievements=98,goal=99,targetRating=260,estimatedGain=10)]
+  for index in (0,1):
+   w.recommend_scope.setCurrentIndex(index);w.render_recommend()
+   assert [w.recommend.horizontalHeaderItem(i).text() for i in range(3)]==['曲目','难度','定数']
+   assert w.recommend.item(0,0).text()=='Example' and w.recommend.item(0,1).text()=='MASTER'
+   assert not w.recommend.item(0,0).textAlignment()&Qt.AlignmentFlag.AlignHCenter
+   for col in range(1,7):assert w.recommend.item(0,col).textAlignment()&Qt.AlignmentFlag.AlignHCenter
+ finally:w.close();app.processEvents()

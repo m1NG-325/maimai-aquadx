@@ -1,8 +1,9 @@
 """Native, scalable report canvases matching the KarenBot image layout."""
+from app.image_assets import image_path
 import math
 from pathlib import Path
 from PySide6.QtCore import Qt, QRectF, QSize, Signal,QPointF
-from PySide6.QtGui import QPainter, QImage, QColor, QFont, QFontMetrics, QPen, QPainterPath,QLinearGradient
+from PySide6.QtGui import QPainter, QImage, QColor, QFont, QFontMetrics, QPen, QPainterPath
 from PySide6.QtWidgets import QWidget, QToolTip, QSizePolicy
 from app.calculations import rating
 
@@ -55,7 +56,7 @@ class ReportCanvas(QWidget):
         key=('cover:' if cover else '')+name
         if key not in self.images:
             path=self.cache/name if cover and (self.cache/name).exists() else self.assets/('covers' if cover else '')/name
-            self.images[key]=QImage(str(path))
+            self.images[key]=QImage(str(image_path(path)))
         return self.images[key]
 
     def clear_covers(self):
@@ -137,17 +138,14 @@ class ReportCanvas(QWidget):
         for offset,key in [(194,'fc'),(212,'fs')]:self.sprite(p,'rating-icon_'+(r.get(key) or 'none')+'.png',(x+offset,y+67,16,16))
         self.hitboxes.append((QRectF(x,y,238,92),mid,f"{title}\n{r.get('difficulty','')} · 达成率 {r['achievements']:.4f}%\n参考定数 {ds if ds is not None else '待核实'} · Rating {ra if ra is not None else '缺定数'}\nFC {r.get('fc') or '—'} / FS {r.get('fs') or '—'}"))
 
-    def paint_type_badge(self,p,kind,x,y):
-        """Native vector lettering stays sharp at screen and export scales."""
-        p.save();p.setPen(QPen(QColor('#ffffff'),.8))
-        gradient=QLinearGradient(x,y,x,y+13)
-        gradient.setColorAt(0,QColor('#fff1a5' if kind=='DX' else '#61d6ff'))
-        gradient.setColorAt(1,QColor('#ffad24' if kind=='DX' else '#1684df'))
-        p.setBrush(gradient);p.drawRoundedRect(QRectF(x,y,27,13),2,2)
-        font=self.report_font(11 if kind=='DX' else 9,True);font.setItalic(kind=='DX')
-        path=QPainterPath();path.addText(x+(4 if kind=='DX' else 4.5),y+10,font,'DX' if kind=='DX' else '标准')
-        p.setPen(QPen(QColor('#8d4b13' if kind=='DX' else '#1670b5'),.8));p.setBrush(QColor('#ffffff'));p.drawPath(path)
-        p.restore()
+    def paint_type_badge(self,p,kind,x,y,width=32):
+        """Shared Chinese artwork, aspect-preserved for display and PNG export."""
+        image=self.image('rating-type_'+kind+'.png')
+        if image.isNull():return False
+        height=width*image.height()/image.width()
+        p.save();p.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        p.drawImage(QRectF(x,y,width,height),image);p.restore()
+        return True
 
     def paint_plate(self,p):
         m=self.model
@@ -170,7 +168,7 @@ class ReportCanvas(QWidget):
             for i,c in enumerate(group['charts']):
                 x=163+(i%12)*87;top=y+(i//12)*90
                 p.fillRect(QRectF(x,top,80,80),QColor(color));self.cover(p,c['music_id'],(x+4,top+4,72,72))
-                self.sprite(p,'rating-type_'+c['type']+'.png',(x+5,top+5,18,9))
+                self.paint_type_badge(p,c['type'],x+5,top+5,28)
                 p.fillRect(QRectF(x+44,top,36,15),QColor(color));self.text(p,(x+44,top,35,15),str(c['music_id']),10,bold=True,align=Qt.AlignmentFlag.AlignCenter)
                 if c['complete']:
                     p.fillRect(QRectF(x+4,top+4,72,72),QColor(255,255,255,170))

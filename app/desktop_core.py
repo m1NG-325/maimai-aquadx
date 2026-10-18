@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 from app.database import Database
 from app.parser import parse_aquadx
@@ -10,10 +11,12 @@ from app.calculations import summarize, plate_progress
 from app.private_catalog import private_view
 from app.local_tools import library_rows, filter_library, recommendations
 from app.lxns import LxnsService, catalog_index
-from app.desktop_storage import default_settings_path,configured_directory,copy_profile,save_directory
+from app.desktop_storage import default_settings_path,default_profile,configured_directory,copy_profile,save_directory
 from app.plate_catalogs import load_plate_catalogs, SCOPE_KEYS, SCOPE_LABELS
 from app.recommendation_scopes import private_recommendations, cn_recommendations
 from app.unified_catalog import UnifiedCatalog
+from app.collection_metadata import load_names,read_xml_names
+from app.archive_analysis import enrich_logs
 
 ASSETS = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[1]))
 
@@ -21,7 +24,7 @@ ASSETS = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[1]))
 class DesktopCore:
     def __init__(self, directory=None,settings_path=None):
         self.settings_path=Path(settings_path) if settings_path is not None else default_settings_path()
-        selected=directory if directory is not None else configured_directory(self.settings_path)
+        selected=directory if directory is not None else (configured_directory(self.settings_path) if settings_path is not None else default_profile())
         self.directory = Path(selected or (Path(os.getenv('LOCALAPPDATA', Path.home())) / 'AquaSync')).expanduser().resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
         self.db = Database(self.directory/'aquasync.sqlite3')
@@ -37,9 +40,22 @@ class DesktopCore:
 
     def shared_catalog(self):
         # Resolve against live source snapshots; no persistent merged cache to become stale.
+        if getattr(self,'_catalog_depth',0) and getattr(self,'_session_catalog',None) is not None:
+            return self._session_catalog
         with self.lxns.catalog_guard:
             data=json.loads(self.lxns.catalog_path.read_text(encoding='utf-8'))
-        return UnifiedCatalog(self.db.charts(),self.db.private_charts(),self.plate_catalogs,catalog_index(data),data.get('versions',[]))
+        registry=UnifiedCatalog(self.db.charts(),self.db.private_charts(),self.plate_catalogs,catalog_index(data),data.get('versions',[]))
+        if getattr(self,'_catalog_depth',0):self._session_catalog=registry
+        return registry
+
+    @contextmanager
+    def catalog_session(self):
+        """Reuse one metadata snapshot during a synchronous UI refresh only."""
+        self._catalog_depth=getattr(self,'_catalog_depth',0)+1
+        try:yield
+        finally:
+            self._catalog_depth-=1
+            if not self._catalog_depth:self._session_catalog=None
 
     def catalog(self,scope='private'):
         return self.shared_catalog().charts(scope)
@@ -100,3 +116,36 @@ class DesktopCore:
     def library(self, user_id, scope='all', **filters):
         payload = self.db.player(user_id) or {'best': []}
         return filter_library(library_rows(self.catalog(scope), [], payload['best']), **filters)
+
+
+    def archive(self,user_id):
+        payload=self.db.player(user_id) or {}
+        return payload.get('archive',{'schema':1,'available':False,'present':[],'sections':{},'warnings':[]})
+
+    def archive_logs(self,user_id):
+        return enrich_logs(self.archive(user_id),self.catalog('private'))
+
+    def collection_names(self):
+        return load_names(ASSETS/'data/collection_metadata.json',self.directory/'collection_metadata.json')
+
+    def map_details(self):
+        from app.map_metadata import load_map_details
+        return load_map_details(ASSETS/'data/map_details.json',self.directory/'map_details.json')
+
+    def activity_details(self):
+        from app.activity_metadata import load_activity_details
+        return load_activity_details(ASSETS/'data/activity_details.json',self.directory/'activity_details.json')
+
+    def import_collection_names(self,directory):
+        data=read_xml_names(directory)
+        from app.map_metadata import read_map_details
+        maps=read_map_details(directory)
+        from app.activity_metadata import read_activity_details
+        activity=read_activity_details(directory)
+        activity_path=self.directory/'activity_details.json';activity_temp=activity_path.with_suffix('.json.tmp')
+        activity_temp.write_text(json.dumps(activity,ensure_ascii=False),encoding='utf-8');activity_temp.replace(activity_path)
+        map_path=self.directory/'map_details.json';map_temp=map_path.with_suffix('.json.tmp')
+        map_temp.write_text(json.dumps(maps,ensure_ascii=False),encoding='utf-8');map_temp.replace(map_path)
+        path=self.directory/'collection_metadata.json';temp=path.with_suffix('.json.tmp')
+        temp.write_text(json.dumps(data,ensure_ascii=False),encoding='utf-8');temp.replace(path)
+        return data

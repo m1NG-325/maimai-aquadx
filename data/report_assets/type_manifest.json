@@ -1,0 +1,25 @@
+{
+  "language": "zh-CN",
+  "entries": [
+    {
+      "type": "SD",
+      "file": "rating-type_SD.png",
+      "source": "User-provided Topaz Wonder upscale of KarenBot-Resources course/type_SD.png",
+      "originalSource": "https://github.com/xszqxszq/KarenBot-Resources/blob/main/data/maimai/templates/course/type_SD.png",
+      "width": 232,
+      "height": 84,
+      "sha256": "ce6e57b0c198b748bf975bf5f179a95df7dee274b54cbd8ca65a70d035b49c70",
+      "processing": "Copied without pixel changes; preserve original alpha; aspect-fit in Qt."
+    },
+    {
+      "type": "DX",
+      "file": "rating-type_DX.png",
+      "source": "User-provided Topaz Wonder upscale of KarenBot-Resources course/type_DX.png",
+      "originalSource": "https://github.com/xszqxszq/KarenBot-Resources/blob/main/data/maimai/templates/course/type_DX.png",
+      "width": 232,
+      "height": 84,
+      "sha256": "bb224462e57d8478807c6ecdb8195e04e2b57516d59ebac67797fffd0bb7374b",
+      "processing": "Copied without pixel changes; preserve original alpha; aspect-fit in Qt."
+    }
+  ]
+}

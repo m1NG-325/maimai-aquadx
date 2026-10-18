@@ -1,5 +1,7 @@
 # AquaSync 2.0
 
+[中文](README.md) · [English](readme_EN.md)
+
 Windows 本地舞萌查分软件，支持导入 AquaDX 私服导出的 maimai2 JSON，查看成绩、B50、牌子进度和推分推荐。
 
 ## 使用

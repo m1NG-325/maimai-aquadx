@@ -1,6 +1,7 @@
 """AquaDX best-record parsing. Achievement uses 1/10000 percent units."""
 from decimal import Decimal, InvalidOperation
 from app.score_times import latest_time,playlog_times,attach_latest
+from app.archive_data import parse_archive
 
 DIFFICULTIES = ('BASIC', 'ADVANCED', 'EXPERT', 'MASTER', 'Re:MASTER')
 FC = {0: '', 1: 'fc', 2: 'fcp', 3: 'ap', 4: 'app'}
@@ -133,4 +134,5 @@ def parse_aquadx(data):
             'playCount': user.get('playCount'), 'romVersion': user.get('lastRomVersion'),
             'dataVersion': user.get('lastDataVersion')}, 'records': records,
             'best': best_records(records), 'ratingComposition': parse_rating_composition(data),
-            'sourceRatings': {k: user.get(k) for k in ('playerOldRating', 'playerNewRating', 'musicRating', 'playerRating')}}
+            'sourceRatings': {k: user.get(k) for k in ('playerOldRating', 'playerNewRating', 'musicRating', 'playerRating')},
+            'archive':parse_archive(data)}

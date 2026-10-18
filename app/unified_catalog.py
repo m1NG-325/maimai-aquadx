@@ -2,12 +2,20 @@
 from copy import deepcopy
 from app.versions import canonical_version, version_order
 
+ATOMIC_TYPES=(str,int,float,bool,bytes,type(None))
+
+
+def copy_chart(chart):
+    # JSON scalar values are immutable. Clone containers, without routing every
+    # title/number through deepcopy's generic dispatch on each UI refresh.
+    return {key:value if type(value) in ATOMIC_TYPES else deepcopy(value) for key,value in chart.items()}
+
 
 def merge_fields(previous, incoming):
     result=dict(previous)
     for key,value in incoming.items():
         if value is not None and value!='':
-            result[key]=deepcopy(value)
+            result[key]=value if type(value) in ATOMIC_TYPES else deepcopy(value)
             if key=='ds':result['constantSource']=incoming.get('constantSource') or incoming.get('source','本地曲库')
         elif key not in result:result[key]=value
     return result
@@ -60,7 +68,7 @@ class UnifiedCatalog:
         if scope in ('jp','jp_history'):
             return self.plate_scopes()[scope]['charts']
         if scope not in self.regions:raise ValueError('未知曲库范围')
-        return [deepcopy(c) for _,c in sorted(self.regions[scope].items())]
+        return [copy_chart(c) for _,c in sorted(self.regions[scope].items())]
 
     def plate_scopes(self):
         result=deepcopy(self.snapshots['scopes'])
