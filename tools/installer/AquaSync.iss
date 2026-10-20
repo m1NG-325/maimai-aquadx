@@ -5,7 +5,7 @@
 #ifndef OutputDir
   #error OutputDir must be specified
 #endif
-#define AppVersion "2.0"
+#define AppVersion "2.1"
 
 [Setup]
 AppId={{BA47F53A-1666-4FCB-9348-C74DDA57EE20}
@@ -33,7 +33,7 @@ CloseApplications=yes
 RestartApplications=no
 SetupLogging=yes
 UninstallDisplayName=AquaSync {#AppVersion}
-VersionInfoVersion=2.0.0.0
+VersionInfoVersion=2.1.0.0
 
 [Languages]
 Name: "chinesesimplified"; MessagesFile: "ChineseSimplified.isl"
@@ -53,6 +53,24 @@ Source: "{#SourceDir}\_internal\*"; DestDir: "{app}\_internal"; Flags: ignorever
 Type: files; Name: "{app}\_internal\data\report_assets\archive\*.png"
 Type: files; Name: "{app}\_internal\data\report_assets\covers\*.png"
 Type: filesandordirs; Name: "{app}\_internal\PIL"
+; Remove only retired bundled dependencies during a 2.0 -> 2.1 upgrade.
+Type: files; Name: "{app}\_internal\icudt*.dll"
+Type: files; Name: "{app}\_internal\icuin*.dll"
+Type: files; Name: "{app}\_internal\icuuc*.dll"
+Type: filesandordirs; Name: "{app}\_internal\pydantic_core"
+Type: files; Name: "{app}\_internal\PySide6\Qt6VirtualKeyboard.dll"
+Type: files; Name: "{app}\_internal\PySide6\Qt6Quick.dll"
+Type: files; Name: "{app}\_internal\PySide6\Qt6Qml*.dll"
+Type: files; Name: "{app}\_internal\PySide6\Qt6OpenGL.dll"
+Type: files; Name: "{app}\_internal\PySide6\Qt6Pdf.dll"
+Type: files; Name: "{app}\_internal\PySide6\plugins\platforminputcontexts\qtvirtualkeyboardplugin.dll"
+Type: files; Name: "{app}\_internal\PySide6\plugins\imageformats\qpdf.dll"
+Type: files; Name: "{app}\_internal\PySide6\plugins\imageformats\qicns.dll"
+Type: files; Name: "{app}\_internal\PySide6\plugins\imageformats\qtga.dll"
+Type: files; Name: "{app}\_internal\PySide6\plugins\imageformats\qtiff.dll"
+Type: files; Name: "{app}\_internal\PySide6\plugins\imageformats\qwbmp.dll"
+Type: files; Name: "{app}\_internal\PySide6\translations\*.qm"
+
 
 [Icons]
 Name: "{param:SHORTCUTDIR|{userdesktop}}\AquaSync"; Filename: "{app}\AquaSync.exe"; WorkingDir: "{app}"; IconFilename: "{app}\AquaSync.exe"

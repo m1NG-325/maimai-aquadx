@@ -109,3 +109,9 @@ Rating 计算页现为原生彩色对照表，默认展示定数12.0～15.0，�
 
 
 2.0当前本地版本：`dist/v2.0/AquaSync.exe`。新增四个完整档案入口，使用前重新导入完整AquaDX JSON；详见 `docs/ARCHIVE-2.0.md` 和 `docs/CHANGELOG-2.0.md`。
+
+## 落雪 CSV 导入
+
+点击「导入落雪 CSV」，选择落雪导出的成绩 CSV。支持 `id,song_name,level_index,achievements,fc,fs,dx_score,song_type` 字段；其他导出列会随快照保留。DX ID、达成率、FC/FS 和有效的 `play_time` 会转换为本地成绩，上传时间不会作为游玩时间。
+
+CSV 不包含玩家资料、原始 B50 分组或完整游玩档案；可查看按本地曲库估算的 B50、成绩和牌子进度。建议使用独立本地玩家 ID；导入同名玩家会在确认后替换其快照，不会合并原有档案。解析失败时保留原快照，导入不会上传落雪。

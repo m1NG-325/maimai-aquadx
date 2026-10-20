@@ -77,7 +77,8 @@ def install():
     class StudioWindow(original):
         def __init__(self,core):
             super().__init__(core)
-            self.setWindowTitle('AquaSync Studio · 2.0')
+            from app import __version__
+            self.setWindowTitle(f'AquaSync Studio · {__version__}')
             style=STYLE
             for token,name in [('CHECK_ICON','check'),('DOWN_ICON','down'),('UP_ICON','up')]:style=style.replace(token,(ASSETS/f'data/report_assets/studio/{name}.svg').as_posix())
             self.setStyleSheet(style)

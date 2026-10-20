@@ -10,6 +10,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-dir', type=Path)
     parser.add_argument('--self-test', action='store_true')
+    parser.add_argument('--audit-runtime', action='store_true', help='Self-test only: exercise packaged dependencies')
     parser.add_argument('--sample', type=Path)
     parser.add_argument('--screenshot', type=Path)
     parser.add_argument('--result', type=Path)
@@ -84,6 +85,9 @@ def main():
         if args.screenshot:
             args.screenshot.parent.mkdir(parents=True, exist_ok=True)
             assert window.grab().save(str(args.screenshot), 'PNG')
+        if args.audit_runtime:
+            from app.runtime_audit import check
+            report['runtimeAudit']=check(core,window,(args.result.parent if args.result else core.directory)/'runtime-audit')
         if args.result:
             args.result.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf8')
         if args.reports_dir and window.data:

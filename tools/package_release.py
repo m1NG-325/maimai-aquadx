@@ -41,7 +41,7 @@ def package(source, output, version):
     instructions = ('AquaSync ' + version + '\n\n'
                     '1. 完整解压文件夹到你选择的位置。\n'
                     '2. 双击 AquaSync.exe，无需安装 Python。\n'
-                    '3. 点击“导入 AquaDX JSON”，选择自己的成绩导出文件。\n\n'
+                    '3. 点击“导入 AquaDX JSON”或“导入落雪 CSV”，选择自己的成绩导出文件。\n\n'
                     '请保留 _internal 文件夹，不要在压缩包内直接运行 EXE。\n'
                     '个人数据保存在 user-data；日志在 logs；本包不包含任何玩家成绩或本机配置。\n'
                     '更新时先关闭程序，保留 user-data 和 AquaSync-desktop.json。\n')
@@ -64,6 +64,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--version', default='2.0')
+    parser.add_argument('--version', default='2.1')
     args = parser.parse_args()
     print(json.dumps(package(args.source, args.output, args.version), ensure_ascii=False, indent=2))

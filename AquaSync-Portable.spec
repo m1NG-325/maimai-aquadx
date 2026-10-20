@@ -20,11 +20,11 @@ a = Analysis([str(root/'desktop_studio.py')], pathex=[str(root)], binaries=[], d
                        'PySide6.QtWebEngineQuick', 'PySide6.QtPdf', 'PySide6.QtPdfWidgets',
                        'PySide6.QtQuick','PySide6.QtQml','PySide6.QtOpenGL',
                        'PySide6.QtQuickWidgets','PySide6.QtQmlModels',
-                       'PIL','pytest', 'tkinter', 'uvicorn'], noarchive=False)
-# Qt on Windows uses the OS ICU API. A Poppler directory on the build host's
-# PATH has unrelated unversioned ICU DLLs; never ship those in place of Windows.
-a.binaries = [entry for entry in a.binaries
-              if Path(entry[0]).name.lower() not in {'icuuc.dll', 'icuin.dll', 'icudt.dll'}]
+                       'PIL','pytest', 'tkinter', 'uvicorn', 'fastapi', 'pydantic', 'pydantic_core'], noarchive=False)
+# Keep the filtering rules shared with the packaged audit.
+prune=runpy.run_path(str(root/'tools/runtime_pruning.py'))['prune']
+a.binaries=prune(a.binaries)
+a.datas=prune(a.datas)
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name='AquaSync', debug=False,
           bootloader_ignore_signals=False, strip=False, upx=False, console=False,

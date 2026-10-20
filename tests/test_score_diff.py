@@ -2,7 +2,7 @@ import json
 import sqlite3
 import httpx
 import pytest
-from fastapi import HTTPException
+from starlette.exceptions import HTTPException
 from app.score_diff import differences, normalize_scores, verify_scores, BackupStore
 from tests.test_lxns import catalog, payload, TOKEN
 from app.lxns import LxnsService

@@ -2,7 +2,7 @@ import json
 import time
 import httpx
 import pytest
-from fastapi import HTTPException
+from starlette.exceptions import HTTPException
 from app.lxns import LxnsService, catalog_index
 from app.parser import parse_aquadx
 

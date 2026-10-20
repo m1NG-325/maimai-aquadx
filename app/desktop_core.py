@@ -74,15 +74,20 @@ class DesktopCore:
         return migrated
 
     def import_file(self, path, user_id):
-        raw = json.loads(Path(path).read_text(encoding='utf-8-sig'))
-        payload = parse_aquadx(raw)
+        path = Path(path)
+        text = path.read_text(encoding='utf-8-sig')
+        if path.suffix.lower() == '.csv':
+            from app.lxns_import import parse_lxns_csv
+            payload = parse_lxns_csv(text)
+        else:
+            payload = parse_aquadx(json.loads(text))
         self.db.save_player(user_id, payload)
         return payload
 
     def overview(self, user_id):
         payload = self.db.player(user_id)
         if payload is None:
-            raise ValueError('请先导入 AquaDX JSON')
+            raise ValueError('请先导入 AquaDX JSON 或落雪 CSV')
         registry = self.shared_catalog()
         charts = registry.charts('private')
         scopes = self.recommendation_scopes(payload,registry=registry)

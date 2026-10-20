@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 import httpx
-from fastapi import HTTPException
+from starlette.exceptions import HTTPException
 from decimal import InvalidOperation
 from app.score_diff import BackupStore, normalize_scores, differences, verify_scores, digest, score_key
 from app.b50_views import source_b50, target_b50, compare_groups, compare_b50

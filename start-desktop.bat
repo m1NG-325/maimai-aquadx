@@ -1,6 +1,10 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+if exist "dist\v2.1\AquaSync\AquaSync.exe" (
+  start "" "dist\v2.1\AquaSync\AquaSync.exe"
+  exit /b 0
+)
 if exist "dist\v2.0\AquaSync.exe" (
   start "" "dist\v2.0\AquaSync.exe"
   exit /b 0

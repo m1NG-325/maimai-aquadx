@@ -148,6 +148,8 @@ def fill(t, rows):
         for j, value in enumerate(row):
             item = QTableWidgetItem(str(value))
             item.setToolTip(str(value))
+            if t.property('centerText'):
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             t.setItem(i, j, item)
     t.resizeRowsToContents()
     t.setUpdatesEnabled(True)
@@ -323,6 +325,7 @@ class MainWindow(QMainWindow):
         title = QLabel(f'AquaSync {__version__}  ·  本地舞萌查分'); title.setStyleSheet('font-size:22px;font-weight:600;color:#78e5d5'); bar.addWidget(title)
         bar.addStretch(); self.user = QComboBox(); self.user.setEditable(True); self.user.setMinimumWidth(150); bar.addWidget(self.user)
         self.button(bar, '导入 AquaDX JSON', self.import_file)
+        self.button(bar, '导入落雪 CSV', self.import_lxns_csv)
         self.button(bar, '加载成绩', self.load)
         self.metric_label = QLabel('先导入成绩，也可以直接使用曲库和计算器。'); self.metric_label.setObjectName('metric');self.metric_label.setWordWrap(True); layout.addWidget(self.metric_label)
         split = QSplitter(); layout.addWidget(split, 1)
@@ -435,10 +438,16 @@ class MainWindow(QMainWindow):
     def uid(self):
         return self.user.currentText().strip() or 'demo'
 
-    def import_file(self):
-        path, _ = QFileDialog.getOpenFileName(self, '选择 AquaDX 导出 JSON', '', 'JSON (*.json)')
+    def import_lxns_csv(self):
+        self.import_file(lxns_csv=True)
+
+    def import_file(self, checked=False, *, lxns_csv=False):
+        path, _ = QFileDialog.getOpenFileName(self, '选择落雪导出 CSV' if lxns_csv else '选择 AquaDX 导出 JSON', '', 'CSV (*.csv)' if lxns_csv else 'JSON (*.json)')
         if not path: return
         if self.core.db.player(self.uid()) and QMessageBox.question(self, '更新本地快照', '导入会更新玩家 '+self.uid()+' 的本地成绩快照。继续？') != QMessageBox.StandardButton.Yes: return
+        if lxns_csv:
+            from app.lxns_import import NOTICE
+            QMessageBox.information(self, '落雪成绩导入', NOTICE+'\n仅导入本地，不会上传。建议使用独立的本地玩家 ID 保存落雪成绩。')
         def work():
             self.core.import_file(path, self.uid()); self.refresh_users(); self.load()
         self.safe(work)
@@ -448,7 +457,11 @@ class MainWindow(QMainWindow):
             self.data = self.core.overview(self.uid()); self.plan = None; self.remote_views = None
             fill(self.sync_table,[]);self.allow_lower.setChecked(False);self.allow_partial.setChecked(False)
             d = self.data; self.metric_label.setText(f"{d['player'].get('name') or self.uid()}    私服 Rating {d['player'].get('rating', '未知')}    最佳谱面 {d['statistics']['charts']}    FC / AP {d['statistics']['fcOrBetter']} / {d['statistics']['apOrBetter']}    曲名已知 {d['privateCatalog']['known']} / {d['statistics']['charts']}")
+            if self.core.db.player(self.uid()).get('source') == 'Lxns CSV' and self.b50_mode.currentIndex() == 0:
+                self.b50_mode.blockSignals(True); self.b50_mode.setCurrentIndex(2); self.b50_mode.blockSignals(False)
             self.render_b50(); self.render_comparison(); self.render_scores(); self.render_plates(); self.render_library(); self.render_recommend(); self.render_stats(); self.render_course()
+            if self.core.db.player(self.uid()).get('source') == 'Lxns CSV':
+                self.metric_label.setText(f"落雪 CSV · {self.uid()}    最佳谱面 {d['statistics']['charts']}    FC / AP {d['statistics']['fcOrBetter']} / {d['statistics']['apOrBetter']}    曲名已知 {d['privateCatalog']['known']} / {d['statistics']['charts']} · 玩家资料未提供")
             self.archives.refresh()
             self.statusBar().showMessage('已加载 '+self.uid()+' · 本地查询无需联网 · 定数为公共参考')
         with self.core.catalog_session():self.safe(work)
@@ -477,7 +490,7 @@ class MainWindow(QMainWindow):
     def render_b50(self):
         if not self.data: return
         mode = self.b50_mode.currentIndex(); view = self.data['b50Views']['source'] if mode==0 else self.data['b50'] if mode==1 else self.data['b50Views']['target'] if mode==2 else best40(self.data['best'])
-        self.b50_info.setText(f"旧曲 {view.get('oldRating', '未知')} + 新曲 {view.get('newRating', '未知')} = {view.get('rating', '未知')}" if view.get('available', True) else '快照没有原始分组，请重新导入原始 JSON。')
+        self.b50_info.setText(f"旧曲 {view.get('oldRating', '未知')} + 新曲 {view.get('newRating', '未知')} = {view.get('rating', '未知')}" if view.get('available', True) else '快照没有原始分组；落雪 CSV 可切换到落雪导入估算，AquaDX 可重新导入完整 JSON。')
         if mode==0 and view.get('available'):
             delta=view['calculatedRating']-view['rating'] if view.get('rating') is not None else None
             self.b50_info.setText(self.b50_info.text()+f"（私服原报） · 单曲计算合计 {view['calculatedRating']}"+(f"（差 {delta:+d}）" if delta is not None else '')+f" · 缺定数 {view['uncalculated']} 张")
@@ -988,6 +1001,9 @@ class MainWindow(QMainWindow):
         actions=QHBoxLayout();layout.addLayout(actions)
         self.button(actions,'全选差异',lambda:self.select_sync('all'));self.button(actions,'只选新增和提高',lambda:self.select_sync('recommended'));self.button(actions,'清空选择',lambda:self.select_sync('none'))
         self.sync_table=table(['选择','曲目 / 难度','原达成率','新达成率','DX 原 → 新','FC / FS 原 → 新','变化']);layout.addWidget(self.sync_table)
+        self.sync_table.setProperty('centerText',True)
+        self.sync_table.horizontalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.sync_table.horizontalHeader().setSectionResizeMode(0,QHeaderView.ResizeMode.ResizeToContents)
         self.allow_lower=QCheckBox('允许提交含降低字段的成绩（可能影响落雪现有最佳值）');layout.addWidget(self.allow_lower)
         self.allow_partial=QCheckBox('知道有未匹配谱面，只上传已匹配成绩');layout.addWidget(self.allow_partial)
         self.button(layout,'核对并上传所选',self.upload_sync)
