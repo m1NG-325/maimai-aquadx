@@ -19,7 +19,7 @@ Supports 64-bit Windows 10/11. Packaged versions do not require Python. Ordinary
 - Import LXNS CSV scores, retaining achievements, DX score, FC/FS and available play times.
 - LXNS CSV imports open the estimated LXNS B50 view by default.
 - Center the LXNS synchronization table text and narrow its selection column to fit its contents.
-- Remove unused runtime dependencies. The `_internal` directory is approximately 65.7 MiB smaller than in 2.0.
+- Remove unused runtime dependencies: the installer decreases from 750.5 MB to 724.7 MB, and the portable archive from 761.0 MB to 730.8 MB (decimal units).
 - Keep the same image assets, dimensions and quality as 2.0, without re-encoding or requiring online asset downloads.
 
 ## Features
@@ -36,7 +36,7 @@ History, profiles and progression views require the corresponding records in an 
 - Close the app before updating. Preserve both the data directory and configuration file. The installer supports in-place upgrades and preserves personal data on uninstall.
 - Reference chart constants and progress calculations may differ from the actual game version.
 
-[Desktop guide (Chinese)](docs/DESKTOP.md) · [2.1 changelog (Chinese)](docs/CHANGELOG-2.1.md) · [Sources and algorithms](docs/ALGORITHMS_AND_SOURCES.md)
+[Desktop guide (Chinese)](docs/DESKTOP.md) · [Releases and changelog](https://github.com/m1NG-325/maimai-aquadx/releases) · [Sources and algorithms](docs/ALGORITHMS_AND_SOURCES.md)
 
 ## Credits
 

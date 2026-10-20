@@ -21,7 +21,7 @@ Windows 本地舞萌查分软件，支持导入 AquaDX 私服导出的 maimai2 J
 - 新增落雪 CSV 成绩导入，保留达成率、DX 分、FC/FS 和文件提供的游玩时间。
 - 落雪 CSV 导入后默认显示落雪 B50 估算，可继续查询成绩和牌子进度。
 - 落雪同步表格的表头和文字居中，「选择」列按内容收窄。
-- 精简未使用的运行依赖，运行依赖与资源目录相比 2.0 减少约 65.7 MiB。
+- 精简未使用的运行依赖：安装包从 750.5 MB 减至 724.7 MB，便携包从 761.0 MB 减至 730.8 MB（按十进制计算）。
 - 图片素材与 2.0 保持一致，没有重新压缩画质、缩小分辨率或改为联网下载。
 
 ## 功能
@@ -54,7 +54,7 @@ Windows 本地舞萌查分软件，支持导入 AquaDX 私服导出的 maimai2 J
 
 公开参考定数可能与游戏实际版本不同，Rating 和牌子进度供参考。
 
-[详细使用说明](docs/DESKTOP.md) · [2.1 更新日志](docs/CHANGELOG-2.1.md) · [算法与数据来源](docs/ALGORITHMS_AND_SOURCES.md)
+[详细使用说明](docs/DESKTOP.md) · [Releases 与更新日志](https://github.com/m1NG-325/maimai-aquadx/releases) · [算法与数据来源](docs/ALGORITHMS_AND_SOURCES.md)
 
 ## 来源与致谢
 
