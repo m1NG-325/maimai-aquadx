@@ -96,6 +96,8 @@ def main():
             assert window.plate_canvas.export_image(args.reports_dir/'plate.png')
         window.close()
         return 0
+    from PySide6.QtCore import QTimer
+    QTimer.singleShot(0, window.show_free_notice)
     return app.exec()
 
 

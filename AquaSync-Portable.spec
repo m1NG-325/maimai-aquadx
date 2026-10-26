@@ -2,12 +2,18 @@
 from pathlib import Path
 import os
 import runpy
+import sys
 root = Path(SPECPATH)
 datas = [(str(root / 'data' / name), 'data') for name in
          ['music_data.json', 'private_music_data.json', 'plate_catalogs.json', 'lxns_song_list.json', 'karen_courses.json', 'collection_metadata.json', 'map_details.json', 'activity_details.json']]
 datas.append((str(root/'docs/KarenBot-LICENSE.txt'), 'licenses'))
 datas.append((str(root/'docs/KarenBot-Resources-LICENSE.txt'), 'licenses'))
 datas.append((str(root/'docs/MaiKit-Assets-LICENSE.txt'), 'licenses'))
+
+# Some Python distributions load a companion public CA file from ssl.py.
+ssl_ca = Path(sys.base_prefix)/'Lib/codex-rejected-cas.pem'
+if ssl_ca.is_file():
+    datas.append((str(ssl_ca), '.'))
 if os.environ.get('AQUASYNC_RELEASE_ASSETS'):
     asset_root=Path(os.environ['AQUASYNC_RELEASE_ASSETS'])
 else:

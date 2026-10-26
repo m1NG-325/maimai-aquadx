@@ -1060,7 +1060,15 @@ class MainWindow(QMainWindow):
 
     def make_help(self):
         from app.credits import CREDITS_HTML
+        from app.updates import REPOSITORY_URL
         layout=self.page('功能与数据说明','本地数据设置、计算口径、参考源码与素材来源。')
+        repository=QLabel(f'项目仓库：<a href="{REPOSITORY_URL}" style="color:#9bd8ff">{REPOSITORY_URL}</a>')
+        repository.setOpenExternalLinks(True);repository.setWordWrap(True);layout.insertWidget(1,repository)
+        actions=QHBoxLayout();layout.addLayout(actions)
+        actions.addWidget(QLabel(f'当前版本：{__version__}'))
+        self.update_button=self.button(actions,'检查更新',self.check_updates)
+        self.button(actions,'免费软件提示',self.show_free_notice)
+        actions.addStretch()
         storage=QGroupBox('数据目录');group=QVBoxLayout(storage);layout.addWidget(storage)
         row=QHBoxLayout();group.addLayout(row)
         self.directory_display=QLineEdit(str(self.core.directory));self.directory_display.setReadOnly(True);row.addWidget(self.directory_display,1)
@@ -1070,6 +1078,35 @@ class MainWindow(QMainWindow):
         self.help_browser.setStyleSheet('QTextBrowser{background:rgba(18,24,43,140);border:1px solid #52617a;border-radius:12px;padding:14px;}')
         self.help_browser.setHtml('<style>body{color:#e7edf8;font-size:13px;}a{color:#9bd8ff;}h2{color:#b5d9ff;}p,li{line-height:1.5;}</style>'+CREDITS_HTML)
         layout.addWidget(self.help_browser,1)
+
+    def show_free_notice(self):
+        from app.desktop_dialogs import NoticeDialog
+        dialog=NoticeDialog(self);dialog.exec()
+
+    def check_updates(self):
+        from app.updates import check_latest
+        from app.desktop_dialogs import UpdateDialog
+        if self.workers:
+            self.statusBar().showMessage('正在执行操作，请稍后再检查更新。');return
+        self.update_button.setEnabled(False);self.update_button.setText('正在检查…')
+        worker=Worker(lambda:check_latest(__version__));self.workers.append(worker)
+        def finish():
+            self.workers.remove(worker)
+            self.update_button.setEnabled(True);self.update_button.setText('检查更新')
+        def done(result):
+            finish();UpdateDialog(result,self).exec()
+        def failed(message):
+            from PySide6.QtCore import QUrl
+            from PySide6.QtGui import QDesktopServices
+            from app.updates import RELEASES_URL
+            finish()
+            box=QMessageBox(QMessageBox.Icon.Warning,'检查更新失败',message,parent=self)
+            release=box.addButton('打开 Releases',QMessageBox.ButtonRole.ActionRole)
+            box.addButton('关闭',QMessageBox.ButtonRole.RejectRole)
+            box.exec()
+            if box.clickedButton() is release:QDesktopServices.openUrl(QUrl(RELEASES_URL))
+        worker.signals.done.connect(done);worker.signals.failed.connect(failed)
+        QThreadPool.globalInstance().start(worker)
 
     def change_data_directory(self):
         if self.workers:

@@ -32,6 +32,15 @@ def check(core, window, output):
     assert not QPixmap(str(svg)).isNull()
     assert not QImage(str(ASSETS/'data/report_assets/aquasync.ico')).isNull()
     ssl.create_default_context()
+    from app.desktop_dialogs import NoticeDialog, UpdateDialog
+    from app.updates import check_latest, RELEASES_URL
+    release=check_latest('2.1',transport=httpx.MockTransport(lambda request:httpx.Response(
+        200,json={'tag_name':'v2.2','body':'Runtime update check'})))
+    assert release['state']=='newer' and release['url']==RELEASES_URL+'/tag/v2.2'
+    for dialog in (NoticeDialog(window),UpdateDialog(release,window)):
+        dialog.show();QApplication.processEvents()
+        assert not dialog.grab().isNull()
+        dialog.accept()
     def handler(request):
         assert request.headers['X-User-Token']=='audit-token'
         return httpx.Response(200,json={'success':True,'data':{'name':'audit','friend_code':123}})
@@ -53,4 +62,5 @@ def check(core, window, output):
             buf=ctypes.create_unicode_buffer(32768)
             if dll.GetModuleFileNameExW(process,module,buf,len(buf)):loaded.append(buf.value)
     return dict(pagesChecked=pages,imageReaders=sorted(formats),codecRoundtrips=roundtrips,
-                svg=True,ico=True,tlsContext=True,mockLxns=True,webFrameworkAbsent=True,loadedModules=loaded)
+                svg=True,ico=True,tlsContext=True,mockLxns=True,updateDialogs=True,mockUpdateCheck=True,
+                webFrameworkAbsent=True,loadedModules=loaded)

@@ -64,6 +64,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--version', default='2.1')
+    parser.add_argument('--version', default='2.2')
     args = parser.parse_args()
     print(json.dumps(package(args.source, args.output, args.version), ensure_ascii=False, indent=2))
